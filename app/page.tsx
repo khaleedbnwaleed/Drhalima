@@ -96,7 +96,6 @@ export default function Home() {
           {[
             { label: currentT.stats.volunteers, value: '2,500+' },
             { label: currentT.stats.supporters, value: '15,000+' },
-            { label: currentT.stats.donations, value: '₦50M+' },
             { label: currentT.stats.communities, value: '45+' },
           ].map((stat, idx) => (
             <div key={idx} className="text-center">
@@ -128,31 +127,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Admin/Dev Quick Access */}
-      <section className="py-8 px-4 md:px-8 lg:px-16 bg-gray-100 border-t border-gray-200">
-        <div className="max-w-6xl mx-auto flex justify-center gap-6 text-sm flex-wrap">
-          <Link 
-            href="/admin/setup"
-            className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
-          >
-            🔧 Admin Setup
-          </Link>
-          <span className="text-gray-400">|</span>
-          <Link 
-            href="/admin/login"
-            className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
-          >
-            🔐 Admin Login
-          </Link>
-          <span className="text-gray-400">|</span>
-          <Link 
-            href="/supporter-login"
-            className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
-          >
-            🤝 Supporter Login
-          </Link>
-        </div>
-      </section>
+      
 
       <Footer locale={locale} />
     </div>
