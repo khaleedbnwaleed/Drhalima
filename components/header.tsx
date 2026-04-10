@@ -1,21 +1,25 @@
 ﻿'use client'
 
 import Link from 'next/link'
-import { Menu, X, Heart, Users, Newspaper, Image, Mail, UserCheck, LogIn, Home } from 'lucide-react'
+import Image from 'next/image'
+import { Menu, X, Heart, Users, Newspaper, Image as ImageIcon, Mail, UserCheck, LogIn, Home, Languages } from 'lucide-react'
 import { useState } from 'react'
 
-export default function Header() {
+interface HeaderProps {
+  locale?: 'en' | 'ha'
+  setLocale?: (locale: 'en' | 'ha') => void
+}
+
+export default function Header({ locale = 'en', setLocale }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navItems = [
-    { label: 'Home', href: '/', icon: Home },
-    { label: 'About', href: '/about', icon: Users },
-    { label: 'News', href: '/news', icon: Newspaper },
-    { label: 'Gallery', href: '/gallery', icon: Image },
-    { label: 'Contact', href: '/contact', icon: Mail },
-    { label: 'Member', href: '/member', icon: UserCheck },
-    { label: 'Supporter', href: '/supporter', icon: Heart },
-    { label: 'Verify', href: '/verify', icon: UserCheck },
+    { label: locale === 'en' ? 'Home' : 'Gida', href: '/', icon: Home },
+    { label: locale === 'en' ? 'About' : 'Game', href: '/about', icon: Users },
+    { label: locale === 'en' ? 'News' : 'Labarai', href: '/news', icon: Newspaper },
+    { label: locale === 'en' ? 'Gallery' : 'Hotuna', href: '/gallery', icon: ImageIcon },
+    { label: locale === 'en' ? 'Contact' : 'Tuntuɓi', href: '/contact', icon: Mail },
+    { label: locale === 'en' ? 'Verify' : 'Tabbatarwa', href: '/verify', icon: UserCheck },
   ]
 
   return (
@@ -24,9 +28,7 @@ export default function Header() {
         <div className="flex h-20 items-center justify-between">
           {/* Logo/Brand Section */}
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">HS</span>
-            </div>
+            <Image src="/Logo.png" alt="Dr. Halima Sulaiman Logo" width={48} height={48} className="rounded-lg" />
             <div className="hidden sm:block">
               <Link href="/" className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
                 Dr. Halima Sulaiman
@@ -51,13 +53,17 @@ export default function Header() {
 
           {/* Login Links */}
           <div className="hidden md:flex items-center space-x-3 ml-4">
-            <Link
-              href="/admin/login"
-              className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
-            >
-              <LogIn size={16} />
-              <span>Admin</span>
-            </Link>
+            {/* Language Toggle */}
+            {setLocale && (
+              <button
+                onClick={() => setLocale(locale === 'en' ? 'ha' : 'en')}
+                className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                aria-label="Toggle language"
+              >
+                <Languages size={16} />
+                <span>{locale === 'en' ? 'EN' : 'HA'}</span>
+              </button>
+            )}
             <div className="h-6 w-px bg-gray-300"></div>
             <Link
               href="/supporter-login"
@@ -95,14 +101,19 @@ export default function Header() {
               </Link>
             ))}
             <div className="border-t border-gray-200 my-4"></div>
-            <Link
-              href="/admin/login"
-              className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <LogIn size={18} />
-              <span className="font-medium">Admin Login</span>
-            </Link>
+            {/* Language Toggle Mobile */}
+            {setLocale && (
+              <button
+                onClick={() => {
+                  setLocale(locale === 'en' ? 'ha' : 'en')
+                  setMobileMenuOpen(false)
+                }}
+                className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 w-full text-left"
+              >
+                <Languages size={18} />
+                <span className="font-medium">Language: {locale === 'en' ? 'English' : 'Hausa'}</span>
+              </button>
+            )}
             <Link
               href="/supporter-login"
               className="flex items-center space-x-3 px-4 py-3 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all duration-200"

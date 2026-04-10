@@ -6,10 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert } from '@/components/ui/alert';
-import { Search, User, Mail, Phone } from 'lucide-react';
+import { Search, User, Mail, Phone, CheckCircle, MapPin, IdCard } from 'lucide-react';
 
 interface SupporterData {
-  supporterId: string;
+  supporter_id: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -17,6 +17,8 @@ interface SupporterData {
   state: string;
   lga: string;
   ward: string;
+  profile_photo_url?: string;
+  qr_code_url?: string;
 }
 
 export default function SupporterVerification() {
@@ -145,36 +147,171 @@ export default function SupporterVerification() {
       )}
 
       {result && (
-        <div className="mt-6 rounded-xl border border-green-200 bg-green-50 p-6">
-          <div className="flex items-center gap-3 text-green-700 font-semibold mb-4">
+        <div className="mt-6">
+          <div className="flex items-center gap-3 text-green-700 font-semibold mb-6">
             <CheckCircle className="w-5 h-5" />
-            <span>Registered member verified</span>
+            <span>Member Verified Successfully</span>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div>
-              <p className="text-sm text-muted-foreground">Full Name</p>
-              <p className="font-semibold">{`${result.first_name} ${result.last_name}`}</p>
+
+          {/* Membership Card - Same as Registration */}
+          <div className="max-w-4xl mx-auto p-8">
+            <div className="membership-card-print bg-linear-to-br from-green-900 via-green-800 to-green-900 rounded-2xl shadow-2xl overflow-hidden relative print:shadow-none print:rounded-none">
+              {/* Background watermark */}
+              <div className="absolute inset-0 opacity-5">
+                <div className="w-full h-full bg-[url('/APC.png')] bg-no-repeat bg-center bg-contain"></div>
+              </div>
+
+              {/* Top accent bar */}
+              <div className="bg-linear-to-r from-yellow-400/20 to-transparent h-16 flex items-center justify-between px-6 gap-4">
+                <div className="flex items-center gap-3">
+                  <img src="/APC.png" alt="APC Logo" className="h-10 w-auto" />
+                  <div className="text-white/90 leading-tight">
+                    <div className="text-sm font-semibold tracking-wider">DR. HALIMA CAMPAIGN</div>
+                    <div className="text-xs text-white/70 uppercase tracking-wide">MEMBERSHIP CARD</div>
+                  </div>
+                </div>
+                <div className="text-white/60 text-xs font-light">
+                  Federal Republic of Nigeria
+                </div>
+              </div>
+
+              {/* Main card content */}
+              <div className="p-6 bg-white/95 backdrop-blur-sm">
+                <div className="flex items-center gap-6">
+                  {/* Photo section */}
+                  <div className="relative">
+                    <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-green-100 shadow-lg">
+                      <img
+                        src={result.profile_photo_url || '/placeholder-user.jpg'}
+                        alt="Member Photo"
+                        className="w-full h-full object-cover"
+                        onError={(event) => {
+                          event.currentTarget.src = '/placeholder-user.jpg';
+                        }}
+                      />
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
+                      <User size={12} className="text-white" />
+                    </div>
+                  </div>
+
+                  {/* Main content */}
+                  <div className="flex-1 grid grid-cols-2 gap-4">
+                    {/* Left column */}
+                    <div className="space-y-3">
+                      <div>
+                        <h2 className="text-2xl font-bold text-gray-900 leading-tight">
+                          {`${result.first_name} ${result.last_name}`}
+                        </h2>
+                        <div className="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full mt-2">
+                          <IdCard size={14} className="mr-1" />
+                          {result.supporter_id}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-2 text-sm">
+                        <div className="flex items-center text-gray-600">
+                          <MapPin size={14} className="mr-2 text-green-600" />
+                          <span className="font-medium">State:</span>
+                          <span className="ml-2">{result.state}</span>
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                          <MapPin size={14} className="mr-2 text-green-600" />
+                          <span className="font-medium">LGA:</span>
+                          <span className="ml-2">{result.lga}</span>
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                          <MapPin size={14} className="mr-2 text-green-600" />
+                          <span className="font-medium">Ward:</span>
+                          <span className="ml-2">{result.ward}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right column - QR Code */}
+                    <div className="flex flex-col items-end">
+                      <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 shadow-sm">
+                        <div className="text-xs text-gray-500 text-center mb-2 font-medium">
+                          Scan to Verify
+                        </div>
+                        {result.qr_code_url ? (
+                          <img
+                            src={result.qr_code_url}
+                            alt="QR Code"
+                            className="w-20 h-20"
+                          />
+                        ) : (
+                          <div className="w-20 h-20 bg-gray-200 rounded flex items-center justify-center">
+                            <span className="text-xs text-gray-500">QR Code</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <div className="flex justify-between items-center text-xs text-gray-500">
+                    <div>
+                      <span className="font-medium">Valid:</span> Lifetime Membership
+                    </div>
+                    <div className="text-right">
+                      <div>Digital Signature</div>
+                      <div className="w-24 h-6 border-b border-gray-300 mt-1"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom accent */}
+              <div className="h-2 bg-linear-to-r from-yellow-400 via-green-500 to-yellow-400"></div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Supporter ID</p>
-              <p className="font-semibold">{result.supporterId}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Email</p>
-              <p className="font-semibold">{result.email}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Phone</p>
-              <p className="font-semibold">{result.phone}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">State</p>
-              <p className="font-semibold">{result.state}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">LGA / Ward</p>
-              <p className="font-semibold">{result.lga} / {result.ward}</p>
-            </div>
+
+            {/* Print styles */}
+            <style jsx global>{`
+              @media print {
+                body * {
+                  visibility: hidden;
+                }
+                .membership-card-print, .membership-card-print * {
+                  visibility: visible;
+                }
+                .membership-card-print {
+                  position: absolute;
+                  left: 0;
+                  top: 0;
+                  width: 100%;
+                  max-width: 3.375in;
+                  height: auto;
+                  margin: 0;
+                  padding: 0;
+                }
+                .no-print {
+                  display: none !important;
+                }
+              }
+            `}</style>
+          </div>
+
+          {/* Additional Actions */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600 mb-4">
+              This member is registered and verified in our campaign database.
+            </p>
+            <Button
+              onClick={() => window.print()}
+              variant="outline"
+              className="mr-2"
+            >
+              Print ID Card
+            </Button>
+            <Button
+              onClick={() => setResult(null)}
+              variant="outline"
+            >
+              Verify Another Member
+            </Button>
           </div>
         </div>
       )}

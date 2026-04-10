@@ -83,10 +83,10 @@ Shiriyar alheria ta ta aiki:
       <Header locale={locale} setLocale={setLocale} />
 
       {/* Hero */}
-      <section className="pt-20 pb-12 px-4 md:px-8 lg:px-16 bg-gradient-to-b from-primary/5">
+      <section className="pt-20 pb-12 px-4 md:px-8 lg:px-16 bg-linear-to-b from-primary/5">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl font-bold text-primary mb-4">{t.title}</h1>
-          <p className="text-2xl text-foreground/80">{t.hero}</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-4">{t.title}</h1>
+          <p className="text-lg sm:text-xl md:text-2xl text-foreground/80">{t.hero}</p>
         </div>
       </section>
 

@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
     let query = supabase
       .from('supporters')
-      .select('supporter_id, first_name, last_name, email, phone, state, lga, ward')
+      .select('supporter_id, first_name, last_name, email, phone, state, lga, ward, profile_photo_url, qr_code_url')
       .maybeSingle();
 
     if (supporterId) {

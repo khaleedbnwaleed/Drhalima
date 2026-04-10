@@ -8,7 +8,7 @@ import Footer from '@/components/footer'
 const t = {
     en: {
       nav: { home: 'Home', about: 'About', platform: 'Platform', vision: 'Vision', gallery: 'Gallery', news: 'News', member: 'Member', volunteer: 'Volunteer', contact: 'Contact' },
-      hero: { title: 'Building a Better Future Together', subtitle: 'Join Dr. Halima Suleiman Zakari\'s movement for positive change and inclusive governance', cta: 'Get Involved' },
+      hero: { title: 'Building a Better Future Together', subtitle: 'Join Dr. Halima Suleiman Zakari\'s movement for positive change and inclusive governance', cta: 'Register as a Member' },
       pillars: 'Our Pillars',
       pillar1: { title: 'Education for All', desc: 'Quality education accessible to every child' },
       pillar2: { title: 'Healthcare', desc: 'Affordable healthcare for all communities' },
@@ -18,7 +18,7 @@ const t = {
     },
     ha: {
       nav: { home: 'Gida', about: 'Game', platform: 'Bâkin Aiki', vision: 'Wahayi', gallery: 'Hotuna', news: 'Labarai', member: 'Membar', volunteer: 'Taimakawa', contact: 'Tuntuɓi' },
-      hero: { title: 'Gina Gida Mafi Kyau Tare', subtitle: 'Shiga cikin yunƙurin Daktariya Halima Suleiman Zakari don daidaitaccen sashen kudi', cta: 'Shiga Cikin' },
+      hero: { title: 'Gina Gida Mafi Kyau Tare', subtitle: 'Shiga cikin yunƙurin Daktariya Halima Suleiman Zakari don daidaitaccen sashen kudi', cta: 'Yi Rajista a Matsayin Memba' },
       pillars: 'Abubuwan Ginawa',
       pillar1: { title: 'Ilimi don Kowa', desc: 'Ilimi mai kyau ga kowa daga yara' },
       pillar2: { title: 'Lafiya', desc: 'Aiki da lafiya na karee ga dukan al\'ummomin' },
@@ -34,11 +34,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      <Header locale={locale} />
       
       {/* Hero Section */}
       <section 
-        className="relative pt-20 pb-32 px-4 md:px-8 lg:px-16 bg-cover bg-center bg-no-repeat min-h-[600px] flex items-center justify-center"
+        className="relative pt-20 pb-16 md:pb-32 px-4 md:px-8 lg:px-16 bg-cover bg-center bg-no-repeat min-h-100 md:min-h-150 flex items-center justify-center"
         style={{
           backgroundImage: 'url(/campaign-hero.jpg)',
         }}
@@ -47,14 +47,14 @@ export default function Home() {
         <div className="absolute inset-0 bg-black/40"></div>
         
         <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-balance text-white drop-shadow-lg">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-balance text-white drop-shadow-lg">
             {currentT.hero.title}
           </h1>
-          <p className="text-xl md:text-2xl text-white/95 text-balance leading-relaxed drop-shadow-md">
+          <p className="text-lg sm:text-xl md:text-2xl text-white/95 text-balance leading-relaxed drop-shadow-md">
             {currentT.hero.subtitle}
           </p>
           <div className="flex gap-4 justify-center pt-8 flex-wrap">
-            <Link href="/volunteer">
+            <Link href="/member">
               <Button size="lg" className="bg-primary hover:bg-primary/90 text-white">
                 {currentT.hero.cta}
               </Button>

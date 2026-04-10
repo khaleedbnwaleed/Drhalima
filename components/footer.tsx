@@ -66,6 +66,9 @@ export default function Footer({ locale }: FooterProps) {
               <Link href="/contact" className="text-foreground/70 hover:text-primary transition-colors">
                 {t.contact}
               </Link>
+              <Link href="/admin/login" className="text-foreground/70 hover:text-primary transition-colors">
+                {locale === 'en' ? 'Login' : 'Shiga'}
+              </Link>
               <Link href="/privacy" className="text-foreground/70 hover:text-primary transition-colors">
                 {t.privacy}
               </Link>
@@ -87,6 +90,12 @@ export default function Footer({ locale }: FooterProps) {
               </Link>
               <Link href="/volunteer" className="text-foreground/70 hover:text-primary transition-colors">
                 Volunteer
+              </Link>
+              <Link href="/member" className="text-foreground/70 hover:text-primary transition-colors">
+                {locale === 'en' ? 'Member' : 'Membar'}
+              </Link>
+              <Link href="/supporter" className="text-foreground/70 hover:text-primary transition-colors">
+                {locale === 'en' ? 'Supporter' : 'Mai Goyon Baya'}
               </Link>
             </nav>
           </div>

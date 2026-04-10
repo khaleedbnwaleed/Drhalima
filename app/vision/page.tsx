@@ -102,9 +102,9 @@ export default function VisionPage() {
       <Header locale={locale} setLocale={setLocale} />
 
       {/* Hero */}
-      <section className="pt-20 pb-12 px-4 md:px-8 lg:px-16 bg-gradient-to-b from-primary/5">
+      <section className="pt-20 pb-12 px-4 md:px-8 lg:px-16 bg-linear-to-b from-primary/5">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl font-bold text-primary mb-6">{t.title}</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-6">{t.title}</h1>
         </div>
       </section>
 
@@ -151,7 +151,7 @@ export default function VisionPage() {
                 <ul className="space-y-4">
                   {phase.items.map((item, itemIdx) => (
                     <li key={itemIdx} className="flex gap-3">
-                      <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
+                      <div className="w-2 h-2 rounded-full bg-primary mt-2 shrink-0" />
                       <span className="text-foreground/80">{item}</span>
                     </li>
                   ))}
@@ -173,7 +173,7 @@ export default function VisionPage() {
             <ul className="space-y-4">
               {t.metrics.map((metric, idx) => (
                 <li key={idx} className="flex gap-4 items-start">
-                  <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center shrink-0 mt-1">
                     <span className="text-secondary font-bold">{idx + 1}</span>
                   </div>
                   <span className="text-lg text-foreground/80 pt-1">{metric}</span>

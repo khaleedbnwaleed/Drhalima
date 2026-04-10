@@ -123,3 +123,27 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Print styles for Member ID Card */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .membership-card-print {
+    visibility: visible;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-width: 3.375in;
+    height: auto;
+    margin: 0;
+    padding: 0;
+  }
+  .membership-card-print * {
+    visibility: visible;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
