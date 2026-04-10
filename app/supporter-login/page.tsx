@@ -47,6 +47,7 @@ export default function SupporterLoginPage() {
         <div className="p-8 space-y-6">
           {/* Header */}
           <div className="text-center">
+            <img src="/Logo.png" alt="Logo" className="mx-auto mb-4 h-16 w-auto" />
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Support Organization
             </h1>

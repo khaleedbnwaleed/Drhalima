@@ -15,13 +15,28 @@ import { AlertCircle, CheckCircle, Upload, Camera, X } from 'lucide-react';
 import MembershipCard from './membership-card';
 import PrivacyNotice from './privacy-notice';
 
+// Helper function to validate Nigerian phone number (flexible format)
+const validateNigerianPhoneFormat = (phone: string): boolean => {
+  // Remove all non-digit characters for validation
+  const cleaned = phone.replace(/\D/g, '');
+  // Should be 10 or 11 digits after cleaning
+  // 10 digits: local format (0XXXXXXXXXX)
+  // 11 digits: international without + (234XXXXXXXXX)
+  return cleaned.length === 10 || cleaned.length === 11;
+};
+
 // Validation schema
 const supporterRegistrationSchema = z.object({
   // Personal Information
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
   lastName: z.string().min(2, 'Last name must be at least 2 characters'),
   email: z.string().email('Valid email is required'),
-  phone: z.string().regex(/^(\+234|0)[789]\d{9}$/, 'Valid Nigerian phone number required'),
+  phone: z.string()
+    .min(10, 'Phone number must be at least 10 digits')
+    .refine(
+      validateNigerianPhoneFormat,
+      'Enter a valid Nigerian phone number (e.g., 08012345678 or +2348012345678)'
+    ),
   dateOfBirth: z.string().optional(),
 
   // Location Information
@@ -31,7 +46,13 @@ const supporterRegistrationSchema = z.object({
   address: z.string().optional(),
 
   // Voter Information
-  pvcNumber: z.string().regex(/^\d{14}$/, 'PVC must be 14 digits').optional().or(z.literal('')),
+  pvcNumber: z.string()
+    .refine(
+      (val) => val === '' || /^\d{14}$/.test(val.replace(/\D/g, '')),
+      'PVC must be 14 digits'
+    )
+    .optional()
+    .or(z.literal('')),
   profilePhoto: z.string().optional(),
 
   // Additional Information
@@ -238,11 +259,19 @@ export default function SupporterRegistrationForm() {
     setError('');
 
     try {
+      // Clean phone number: remove spaces, dashes, parentheses
+      const cleanedPhone = data.phone.replace(/[\s\-\(\)]/g, '');
+      
+      // Clean PVC number: remove spaces, dashes
+      const cleanedPVC = data.pvcNumber ? data.pvcNumber.replace(/[\s\-]/g, '') : '';
+
       const response = await fetch('/api/supporters', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...data,
+          phone: cleanedPhone,
+          pvcNumber: cleanedPVC || undefined,
           state: 'Jigawa',
           profilePhoto: profilePhoto || undefined,
         }),
@@ -424,13 +453,16 @@ export default function SupporterRegistrationForm() {
               <Label htmlFor="phone">Phone Number (Nigerian) *</Label>
               <Input
                 id="phone"
-                placeholder="+2348012345678 or 08012345678"
+                placeholder="e.g., 08012345678 or +234 801 234 5678"
                 {...register('phone')}
                 className={errors.phone ? 'border-red-500' : ''}
               />
               {errors.phone && (
                 <p className="text-sm text-red-600 mt-1">{errors.phone.message}</p>
               )}
+              <p className="text-xs text-gray-500 mt-1">
+                Format: 0801234567 (local) or +2348012345678 (international), spaces/dashes allowed
+              </p>
             </div>
 
             <div>
@@ -536,8 +568,8 @@ export default function SupporterRegistrationForm() {
               <Label htmlFor="pvcNumber">PVC Number (Permanent Voter's Card - Optional)</Label>
               <Input
                 id="pvcNumber"
-                placeholder="14-digit PVC number"
-                maxLength={14}
+                placeholder="e.g., 1234567890123 or 12 3456 7890 1234"
+                maxLength={20}
                 {...register('pvcNumber')}
                 className={errors.pvcNumber ? 'border-red-500' : ''}
               />
@@ -545,7 +577,7 @@ export default function SupporterRegistrationForm() {
                 <p className="text-sm text-red-600 mt-1">{errors.pvcNumber.message}</p>
               )}
               <p className="text-xs text-gray-500 mt-1">
-                Having a verified PVC helps us track supporter registration status
+                14-digit PVC number (spaces allowed). Having a verified PVC helps track registration status
               </p>
             </div>
 

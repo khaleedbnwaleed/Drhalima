@@ -8,13 +8,24 @@ import Header from '@/components/header'
 import Footer from '@/components/footer'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Users, Heart, Target } from 'lucide-react'
+import { Users, Heart, Target, AlertCircle, CheckCircle } from 'lucide-react'
+
+// Helper function to validate Nigerian phone number (flexible format)
+const validateNigerianPhoneFormat = (phone: string): boolean => {
+  const cleaned = phone.replace(/\D/g, '')
+  return cleaned.length === 10 || cleaned.length === 11
+}
 
 const volunteerSchema = z.object({
   firstName: z.string().min(2, 'First name is required'),
   lastName: z.string().min(2, 'Last name is required'),
   email: z.string().email('Valid email is required'),
-  phone: z.string().min(10, 'Valid phone number is required'),
+  phone: z.string()
+    .min(10, 'Phone number must be at least 10 digits')
+    .refine(
+      validateNigerianPhoneFormat,
+      'Enter a valid Nigerian phone number (e.g., 08012345678 or +2348012345678)'
+    ),
   location: z.string().min(2, 'Location is required'),
   volunteerType: z.string().min(1, 'Please select a volunteer type'),
   skills: z.string().optional(),
@@ -26,6 +37,7 @@ export default function VolunteerPage() {
   const [locale, setLocale] = useState<'en' | 'ha'>('en')
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<VolunteerFormData>({
     resolver: zodResolver(volunteerSchema),
@@ -33,20 +45,33 @@ export default function VolunteerPage() {
 
   const onSubmit = async (data: VolunteerFormData) => {
     setLoading(true)
+    setError('')
+
     try {
+      // Clean phone number: remove spaces, dashes, parentheses
+      const cleanedPhone = data.phone.replace(/[\s\-\(\)]/g, '')
+
       const response = await fetch('/api/volunteers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          phone: cleanedPhone,
+        }),
       })
+
+      const result = await response.json()
 
       if (response.ok) {
         setSubmitted(true)
         reset()
-        setTimeout(() => setSubmitted(false), 5000)
+        setError('')
+      } else {
+        setError(result.error || 'Failed to register as volunteer. Please try again.')
       }
-    } catch (error) {
-      console.error('Error submitting volunteer form:', error)
+    } catch (err) {
+      setError('An unexpected error occurred. Please check your connection and try again.')
+      console.error('Error submitting volunteer form:', err)
     } finally {
       setLoading(false)
     }
@@ -153,12 +178,22 @@ export default function VolunteerPage() {
           <Card className="p-8 md:p-12">
             <h2 className="text-3xl font-bold text-primary mb-8">{currentT.form}</h2>
 
-            {submitted && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-green-800">{currentT.success}</p>
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex gap-3">
+                <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <p className="text-red-700">{error}</p>
               </div>
             )}
 
+            {submitted && (
+              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <p className="text-green-700 font-medium">{currentT.success}</p>
+              </div>
+            )}
+
+            {!submitted && (
+            {!submitted && (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
@@ -206,9 +241,13 @@ export default function VolunteerPage() {
                   <input
                     {...register('phone')}
                     type="tel"
-                    className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder={locale === 'en' ? 'e.g., 08012345678 or +234 801 234 5678' : 'Misali: 08012345678'}
+                    className={`w-full px-4 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary ${
+                      errors.phone ? 'border-red-500' : 'border-border'
+                    }`}
                   />
                   {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
+                  {!errors.phone && <p className="text-xs text-gray-500 mt-1">{locale === 'en' ? 'Format: 0801234567 or +2348012345678, spaces/dashes allowed' : 'Sarari: 0801234567 ko +2348012345678'}</p>}
                 </div>
 
                 <div>
@@ -260,6 +299,22 @@ export default function VolunteerPage() {
                 {loading ? 'Submitting...' : currentT.submit}
               </Button>
             </form>
+            )}
+
+            {submitted && (
+              <div className="text-center">
+                <Button
+                  onClick={() => {
+                    setSubmitted(false)
+                    setError('')
+                  }}
+                  variant="outline"
+                  className="mt-4"
+                >
+                  {locale === 'en' ? 'Register Another Person' : 'Tajiya Wani Mutum'}
+                </Button>
+              </div>
+            )}
           </Card>
         </div>
       </section>

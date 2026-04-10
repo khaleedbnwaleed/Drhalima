@@ -47,9 +47,7 @@ export default function AdminLoginPage() {
         <div className="p-8 space-y-6">
           {/* Header */}
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl mb-4">
-              <span className="text-white font-bold text-2xl">HS</span>
-            </div>
+            <img src="/Logo.png" alt="Logo" className="mx-auto mb-4 h-16 w-auto" />
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Admin Panel
             </h1>
