@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     // Hash password
     const passwordHash = await bcrypt.hash(password, 12)
 
-    // Create supporter record
+    // Create organization supporter record
     const { data: newSupporter, error: createError } = await supabase
       .from('supporters')
       .insert([
@@ -49,8 +49,8 @@ export async function POST(request: Request) {
           contact_person: contactPerson || null,
           phone: phone || null,
           address: address || null,
+          account_type: 'organization',
           status: 'active',
-          created_at: new Date().toISOString(),
         }
       ])
       .select()
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       { 
         success: true, 
         message: 'Account created successfully. Please sign in.',
-        supporter: {
+        organization: {
           id: newSupporter[0].id,
           email: newSupporter[0].email,
           organizationName: newSupporter[0].organization_name,

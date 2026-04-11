@@ -14,11 +14,12 @@ export async function POST(request: Request) {
       )
     }
 
-    // Fetch supporter from database
+    // Fetch organization supporter from database
     const { data: supporter, error: fetchError } = await supabase
       .from('supporters')
       .select('*')
       .eq('email', email)
+      .eq('account_type', 'organization')
       .single()
 
     if (fetchError || !supporter) {
@@ -28,7 +29,14 @@ export async function POST(request: Request) {
       )
     }
 
-    // Verify password
+    // Verify password (handle both old supporters without password_hash and new ones)
+    if (!supporter.password_hash) {
+      return Response.json(
+        { error: 'Invalid email or password' },
+        { status: 401 }
+      )
+    }
+
     const passwordValid = await bcrypt.compare(password, supporter.password_hash)
 
     if (!passwordValid) {
