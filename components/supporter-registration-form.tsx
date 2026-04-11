@@ -47,12 +47,13 @@ const supporterRegistrationSchema = z.object({
 
   // Voter Information
   pvcNumber: z.string()
+    .trim()
     .refine(
-      (val) => val === '' || /^\d{14}$/.test(val.replace(/\D/g, '')),
-      'PVC must be 14 digits'
+      (val) => val.length === 0 || /^\d{14}$/.test(val.replace(/\D/g, '')),
+      'PVC must be 14 digits if provided'
     )
     .optional()
-    .or(z.literal('')),
+    .default(''),
   profilePhoto: z.string().optional(),
 
   // Additional Information
