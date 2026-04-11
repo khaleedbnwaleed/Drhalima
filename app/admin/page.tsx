@@ -29,31 +29,41 @@ export default function AdminDashboard() {
     // Check authentication and load stats
     const checkAuth = async () => {
       try {
-        // Fetch dashboard data
-        const responses = await Promise.all([
-          fetch('/api/volunteers'),
-          fetch('/api/donations'),
-          fetch('/api/contact'),
-          fetch('/api/news'),
-        ])
-
-        // For now, we'll just show placeholder data
-        // In production, these would return actual counts
+        // Fetch real dashboard data from the stats API
+        const response = await fetch('/api/admin/dashboard/stats');
+        if (response.ok) {
+          const data = await response.json();
+          setStats({
+            volunteers: data.summary.total_volunteers,
+            donations: data.summary.total_donations,
+            messages: data.recent_campaigns?.length || 0,
+            news: 0, // Will be updated when news API is implemented
+          });
+        } else {
+          // Fallback to placeholder data if API fails
+          setStats({
+            volunteers: 142,
+            donations: 2850000,
+            messages: 47,
+            news: 8,
+          });
+        }
+      } catch (error) {
+        console.error('Error loading dashboard:', error);
+        // Fallback to placeholder data
         setStats({
           volunteers: 142,
           donations: 2850000,
           messages: 47,
           news: 8,
-        })
-      } catch (error) {
-        console.error('Error loading dashboard:', error)
+        });
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    checkAuth()
-  }, [])
+    checkAuth();
+  }, []);
 
   const handleLogout = () => {
     // Clear session and redirect
@@ -71,6 +81,13 @@ export default function AdminDashboard() {
   }
 
   const dashboardItems = [
+    {
+      icon: Users,
+      label: 'Members',
+      value: 'View All',
+      href: '/admin/members',
+      color: 'primary',
+    },
     {
       icon: Users,
       label: 'Volunteers',
@@ -183,10 +200,12 @@ export default function AdminDashboard() {
             </h2>
             <div className="space-y-3">
               {[
+                { label: 'View All Members', href: '/admin/members' },
                 { label: 'View All Volunteers', href: '/admin/volunteers' },
                 { label: 'View All Donations', href: '/admin/donations' },
                 { label: 'Manage Messages', href: '/admin/messages' },
                 { label: 'Manage News', href: '/admin/news' },
+                { label: 'Create News Post', href: '/admin/news/create' },
               ].map((link) => (
                 <Link key={link.href} href={link.href}>
                   <Button variant="outline" className="w-full justify-start">

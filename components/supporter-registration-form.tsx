@@ -295,6 +295,43 @@ export default function SupporterRegistrationForm() {
     }
   };
 
+  const downloadMembershipCard = async () => {
+    try {
+      // Find the membership card element
+      const cardElement = document.querySelector('.membership-card') as HTMLElement;
+      if (!cardElement) {
+        alert('Membership card not found. Please try again.');
+        return;
+      }
+
+      // Use html2canvas to capture the card as an image
+      const html2canvas = (await import('html2canvas')).default;
+      const canvas = await html2canvas(cardElement, {
+        backgroundColor: '#ffffff',
+        scale: 2, // Higher resolution
+        useCORS: true,
+        allowTaint: true,
+      });
+
+      // Convert to blob and download
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `membership-card-${registrationData?.supporter?.supporterId || 'member'}.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+      }, 'image/png', 1.0);
+    } catch (error) {
+      console.error('Error downloading membership card:', error);
+      alert('Failed to download membership card. Please try again.');
+    }
+  };
+
   const onSubmit = async (data: SupporterFormData) => {
     // Validate that we're on the last step
     if (currentStep !== steps.length - 1) {
@@ -408,10 +445,10 @@ export default function SupporterRegistrationForm() {
 
           <div className="text-center mt-6 no-print">
             <Button
-              onClick={() => window.print()}
+              onClick={downloadMembershipCard}
               className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg mr-4"
             >
-              Print Membership Card
+              Download Membership Card
             </Button>
             <Button
               onClick={() => window.location.href = '/'}

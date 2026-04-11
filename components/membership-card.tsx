@@ -36,7 +36,7 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
 
   return (
     <div className="max-w-4xl mx-auto p-8">
-      <div className="membership-card-print bg-linear-to-br from-green-900 via-green-800 to-green-900 rounded-2xl shadow-2xl overflow-hidden relative print:shadow-none print:rounded-none">
+      <div className="membership-card membership-card-print bg-linear-to-br from-green-900 via-green-800 to-green-900 rounded-2xl shadow-2xl overflow-hidden relative print:shadow-none print:rounded-none">
         {/* Background watermark */}
         <div className="absolute inset-0 opacity-5">
           <div className="w-full h-full bg-[url('/APC.png')] bg-no-repeat bg-center bg-contain"></div>
