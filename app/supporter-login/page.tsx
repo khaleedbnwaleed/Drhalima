@@ -32,8 +32,12 @@ export default function SupporterLoginPage() {
         return
       }
 
-      // Redirect to supporter dashboard
-      router.push('/supporter')
+      // Redirect based on account type
+      if (data.supporter.accountType === 'organization') {
+        router.push('/supporter-dashboard')
+      } else {
+        router.push('/supporter')
+      }
     } catch (err) {
       setError('An error occurred. Please try again.')
     } finally {

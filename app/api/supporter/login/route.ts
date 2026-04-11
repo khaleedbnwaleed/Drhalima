@@ -53,6 +53,7 @@ export async function POST(request: Request) {
       email: supporter.email,
       organizationName: supporter.organization_name,
       role: 'supporter',
+      accountType: supporter.account_type,
     }), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -67,7 +68,8 @@ export async function POST(request: Request) {
           id: supporter.id, 
           email: supporter.email, 
           organizationName: supporter.organization_name,
-          role: 'supporter' 
+          role: 'supporter',
+          accountType: supporter.account_type,
         } 
       },
       { status: 200 }
