@@ -26,14 +26,82 @@ const memberSchema = z.object({
 
 type MemberFormData = z.infer<typeof memberSchema>
 
-// Nigerian states
-const NIGERIAN_STATES = [
-  'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue',
-  'Borno', 'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu',
-  'Gombe', 'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi',
-  'Kwara', 'Lagos', 'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo',
-  'Plateau', 'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara', 'FCT',
-]
+// Jigawa State LGAs and their wards
+const JIGAWA_LGAS: Record<string, string[]> = {
+  'Dutse': [
+    'Aujara',
+    'Chamo',
+    'Dutse',
+    'Fagam',
+    'Galambi',
+    'Kachi',
+    'Limawa',
+    'Madobi',
+    'Sakwaya',
+    'Takur',
+  ],
+  'Jahun': [
+    'Aujara',
+    'Gangawa',
+    'Harbo Sabuwa',
+    'Harbo Tsohuwa',
+    'Jabarna',
+    'Jahun',
+    'Kanwa',
+    'Kafin Baka',
+    'Gunka',
+    'Yalleman',
+  ],
+  'Kiyawa': [
+    'Andaza',
+    'Fake',
+    'Katanga',
+    'Kiyawa',
+    'Kwadaza',
+    'Maje',
+    'Tsirma',
+    'Zango',
+    'Karankiya',
+    'Daban Gari',
+  ],
+  'Birnin Kudu': [
+    'Birnin Kudu',
+    'Kantoga',
+    'Kangire',
+    'Kwangwara',
+    'Kiyako',
+    'Sundumina',
+    'Surko',
+    'Lafiya',
+    'Unguwar Ƴa',
+    'Yalwan Damai',
+    'Wurno',
+  ],
+  'Buji': [
+    'Buji',
+    'Chira',
+    'Falageri',
+    'Gantsa',
+    'Kafin Madaki',
+    'Yakun',
+    'Ahoto',
+    'Madabe',
+    'Gwadayi',
+    'Gagarawa',
+  ],
+  'Gwaram': [
+    'Basirka',
+    'Dingaya',
+    'Fagam',
+    'Gwaram',
+    'Kwandiko',
+    'Maruta',
+    'Sara',
+    'Tsangarwa',
+    'Zandam',
+    'Kila',
+  ],
+}
 
 const SUPPORT_STATUS_OPTIONS = [
   { value: 'supporter', label: 'Supporter' },
@@ -51,16 +119,24 @@ export default function OrganizationMemberForm({ onMemberAdded, onBulkUpload }: 
   const [showBulkUpload, setShowBulkUpload] = useState(false)
   const [bulkFile, setBulkFile] = useState<File | null>(null)
   const [bulkUploading, setBulkUploading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [selectedState, setSelectedState] = useState('Jigawa')
+  const [selectedLga, setSelectedLga] = useState('')
+  const [selectedWard, setSelectedWard] = useState('')
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<MemberFormData>({
     resolver: zodResolver(memberSchema),
     defaultValues: {
       support_status: 'supporter',
+      state: 'Jigawa',
     },
   })
 
@@ -97,6 +173,35 @@ export default function OrganizationMemberForm({ onMemberAdded, onBulkUpload }: 
       setError(err instanceof Error ? err.message : 'Bulk upload failed')
     } finally {
       setBulkUploading(false)
+    }
+  }
+
+  const onSubmit = async (data: any) => {
+    setLoading(true)
+    setError('')
+    setSuccess('')
+
+    try {
+      const response = await fetch('/api/supporter/organization/members/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        setError(result.error || 'Failed to register member')
+        return
+      }
+
+      setSuccess('Member registered successfully!')
+      reset()
+      onMemberAdded?.()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to register member')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -238,22 +343,14 @@ export default function OrganizationMemberForm({ onMemberAdded, onBulkUpload }: 
             <Label htmlFor="state" className="mb-2 block">
               State *
             </Label>
-            <Select value={selectedState} onValueChange={(value) => {
-              setSelectedState(value)
-              register('state').onChange({ target: { value } } as any)
-            }}>
+            <Select value={selectedState} disabled>
               <SelectTrigger id="state" className={errors.state ? 'border-red-500' : ''}>
-                <SelectValue placeholder="Select State" />
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {NIGERIAN_STATES.map((state) => (
-                  <SelectItem key={state} value={state}>
-                    {state}
-                  </SelectItem>
-                ))}
+                <SelectItem value="Jigawa">Jigawa</SelectItem>
               </SelectContent>
             </Select>
-            <input type="hidden" {...register('state', { value: selectedState })} />
             {errors.state && (
               <p className="text-red-600 text-sm mt-1">{errors.state.message}</p>
             )}
@@ -263,12 +360,22 @@ export default function OrganizationMemberForm({ onMemberAdded, onBulkUpload }: 
             <Label htmlFor="lga" className="mb-2 block">
               LGA (Local Government Area) *
             </Label>
-            <Input
-              id="lga"
-              placeholder="e.g., Lagos Island"
-              {...register('lga')}
-              className={errors.lga ? 'border-red-500' : ''}
-            />
+            <Select value={selectedLga} onValueChange={(value) => {
+              setSelectedLga(value)
+              setSelectedWard('')
+              setValue('lga', value)
+            }}>
+              <SelectTrigger id="lga" className={errors.lga ? 'border-red-500' : ''}>
+                <SelectValue placeholder="Select LGA" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.keys(JIGAWA_LGAS).map((lga) => (
+                  <SelectItem key={lga} value={lga}>
+                    {lga}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {errors.lga && (
               <p className="text-red-600 text-sm mt-1">{errors.lga.message}</p>
             )}
@@ -278,11 +385,21 @@ export default function OrganizationMemberForm({ onMemberAdded, onBulkUpload }: 
             <Label htmlFor="ward" className="mb-2 block">
               Ward (Optional)
             </Label>
-            <Input
-              id="ward"
-              placeholder="e.g., Ward 1"
-              {...register('ward')}
-            />
+            <Select value={selectedWard} onValueChange={(value) => {
+              setSelectedWard(value)
+              setValue('ward', value)
+            }} disabled={!selectedLga}>
+              <SelectTrigger id="ward">
+                <SelectValue placeholder="Select Ward" />
+              </SelectTrigger>
+              <SelectContent>
+                {selectedLga && JIGAWA_LGAS[selectedLga]?.map((ward) => (
+                  <SelectItem key={ward} value={ward}>
+                    {ward}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 

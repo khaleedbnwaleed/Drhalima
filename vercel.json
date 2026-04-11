@@ -3,11 +3,6 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "regions": ["fra1"],
-  "functions": {
-    "**/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "env": {
     "NODE_ENV": "production",
     "NEXT_PUBLIC_APP_URL": "https://your-app-name.vercel.app",
