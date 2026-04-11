@@ -1,0 +1,10 @@
+.next
+.env.local
+.env.local.backup
+node_modules
+.git
+.gitignore
+README.md
+SETUP_GUIDE.md
+DEPLOYMENT_CHECKLIST.md
+scripts/
