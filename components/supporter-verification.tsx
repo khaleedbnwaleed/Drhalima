@@ -6,7 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert } from '@/components/ui/alert';
-import { Search, User, Mail, Phone, CheckCircle, MapPin, IdCard } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Search, User, Mail, Phone, CheckCircle, MapPin, IdCard, Camera } from 'lucide-react';
+import QRScanner from './qr-scanner';
+import MembershipCard from './membership-card';
 
 interface SupporterData {
   supporter_id: string;
@@ -29,6 +32,7 @@ export default function SupporterVerification() {
   const [error, setError] = useState('');
   const [result, setResult] = useState<SupporterData | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [scanResult, setScanResult] = useState<{ supporterId: string; email: string } | null>(null);
 
   const handleVerify = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -68,6 +72,45 @@ export default function SupporterVerification() {
     }
   };
 
+  const handleQRScanSuccess = async (scanData: { supporterId: string; email: string }) => {
+    setScanResult(scanData);
+    setError('');
+    setResult(null);
+    setNotFound(false);
+
+    // Auto-verify using scanned data
+    setLoading(true);
+    try {
+      const response = await fetch('/api/supporters/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ supporterId: scanData.supporterId, email: scanData.email }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.error || 'Verification failed');
+        return;
+      }
+
+      if (data.found) {
+        setResult(data.supporter);
+      } else {
+        setNotFound(true);
+        setError('Scanned QR code does not match any registered member.');
+      }
+    } catch (err) {
+      console.error('Verify error:', err);
+      setError('Unable to verify member right now.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleQRScanError = (error: string) => {
+    setError(error);
+  };
+
   return (
     <Card className="p-8">
       <div className="mb-6">
@@ -76,7 +119,7 @@ export default function SupporterVerification() {
           <h2 className="text-2xl font-bold">Verify Membership</h2>
         </div>
         <p className="text-sm text-muted-foreground mt-2">
-          Enter member email, phone number, or supporter ID to confirm registration.
+          Enter member details manually or scan their QR code to confirm registration.
         </p>
       </div>
 
@@ -86,59 +129,86 @@ export default function SupporterVerification() {
         </Alert>
       )}
 
-      <form onSubmit={handleVerify} className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-3">
-          <div>
-            <Label htmlFor="verifyEmail">Email</Label>
-            <div className="relative">
-              <Input
-                id="verifyEmail"
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="member@example.com"
-              />
-              <Mail className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            </div>
-          </div>
+      <Tabs defaultValue="manual" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="manual">Manual Entry</TabsTrigger>
+          <TabsTrigger value="scan">Scan QR Code</TabsTrigger>
+        </TabsList>
 
-          <div>
-            <Label htmlFor="verifyPhone">Phone</Label>
-            <div className="relative">
-              <Input
-                id="verifyPhone"
-                type="tel"
-                value={phone}
-                onChange={(event) => setPhone(event.target.value)}
-                placeholder="08012345678"
-              />
-              <Phone className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            </div>
-          </div>
+        <TabsContent value="manual" className="mt-6">
+          <form onSubmit={handleVerify} className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-3">
+              <div>
+                <Label htmlFor="verifyEmail">Email</Label>
+                <div className="relative">
+                  <Input
+                    id="verifyEmail"
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder="member@example.com"
+                  />
+                  <Mail className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                </div>
+              </div>
 
-          <div>
-            <Label htmlFor="verifyId">Supporter ID</Label>
-            <div className="relative">
-              <Input
-                id="verifyId"
-                value={supporterId}
-                onChange={(event) => setSupporterId(event.target.value)}
-                placeholder="SUP-2026-000001"
-              />
-              <User className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            </div>
-          </div>
-        </div>
+              <div>
+                <Label htmlFor="verifyPhone">Phone</Label>
+                <div className="relative">
+                  <Input
+                    id="verifyPhone"
+                    type="tel"
+                    value={phone}
+                    onChange={(event) => setPhone(event.target.value)}
+                    placeholder="08012345678"
+                  />
+                  <Phone className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                </div>
+              </div>
 
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <p className="text-sm text-muted-foreground">
-            At least one field is required for verification.
-          </p>
-          <Button type="submit" disabled={loading} className="w-full md:w-auto">
-            {loading ? 'Verifying...' : 'Verify Member'}
-          </Button>
-        </div>
-      </form>
+              <div>
+                <Label htmlFor="verifyId">Supporter ID</Label>
+                <div className="relative">
+                  <Input
+                    id="verifyId"
+                    value={supporterId}
+                    onChange={(event) => setSupporterId(event.target.value)}
+                    placeholder="SUP-2026-000001"
+                  />
+                  <User className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <p className="text-sm text-muted-foreground">
+                At least one field is required for verification.
+              </p>
+              <Button type="submit" disabled={loading} className="w-full md:w-auto">
+                {loading ? 'Verifying...' : 'Verify Member'}
+              </Button>
+            </div>
+          </form>
+        </TabsContent>
+
+        <TabsContent value="scan" className="mt-6">
+          <QRScanner
+            onScanSuccess={handleQRScanSuccess}
+            onScanError={handleQRScanError}
+          />
+          {scanResult && (
+            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center gap-2 text-green-700">
+                <CheckCircle className="w-4 h-4" />
+                <span className="font-medium">QR Code Scanned Successfully</span>
+              </div>
+              <p className="text-sm text-green-600 mt-1">
+                ID: {scanResult.supporterId} | Email: {scanResult.email}
+              </p>
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
 
       {notFound && (
         <Alert className="mt-6 border-yellow-500 bg-yellow-50 text-yellow-700">
@@ -154,15 +224,24 @@ export default function SupporterVerification() {
           </div>
 
           {/* Membership Card - Same as Registration */}
-          <div className="max-w-4xl mx-auto p-8">
-            <div className="membership-card-print bg-linear-to-br from-green-900 via-green-800 to-green-900 rounded-2xl shadow-2xl overflow-hidden relative print:shadow-none print:rounded-none">
-              {/* Background watermark */}
-              <div className="absolute inset-0 opacity-5">
-                <div className="w-full h-full bg-[url('/APC.png')] bg-no-repeat bg-center bg-contain"></div>
-              </div>
+          <MembershipCard
+            memberData={{
+              fullName: `${result.first_name} ${result.last_name}`,
+              cardId: result.supporter_id,
+              state: result.state,
+              lga: result.lga,
+              ward: result.ward,
+              photoUrl: result.profile_photo_url || '/placeholder-user.jpg',
+              qrCodeUrl: result.qr_code_url,
+              qrCodeData: `SUP:${result.supporter_id}|EMAIL:${result.email}`,
+            }}
+          />
 
-              {/* Top accent bar */}
-              <div className="bg-linear-to-r from-yellow-400/20 to-transparent h-16 flex items-center justify-between px-6 gap-4">
+          {/* Additional Actions */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600 mb-4">
+              This member is registered and verified in our campaign database.
+            </p>
                 <div className="flex items-center gap-3">
                   <img src="/APC.png" alt="APC Logo" className="h-10 w-auto" />
                   <div className="text-white/90 leading-tight">
@@ -262,37 +341,6 @@ export default function SupporterVerification() {
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Bottom accent */}
-              <div className="h-2 bg-linear-to-r from-yellow-400 via-green-500 to-yellow-400"></div>
-            </div>
-
-            {/* Print styles */}
-            <style jsx global>{`
-              @media print {
-                body * {
-                  visibility: hidden;
-                }
-                .membership-card-print, .membership-card-print * {
-                  visibility: visible;
-                }
-                .membership-card-print {
-                  position: absolute;
-                  left: 0;
-                  top: 0;
-                  width: 100%;
-                  max-width: 3.375in;
-                  height: auto;
-                  margin: 0;
-                  padding: 0;
-                }
-                .no-print {
-                  display: none !important;
-                }
-              }
-            `}</style>
-          </div>
 
           {/* Additional Actions */}
           <div className="mt-6 text-center">

@@ -10,7 +10,8 @@ interface MembershipCardProps {
     lga: string;
     ward: string;
     photoUrl: string;
-    qrCodeData: string;
+    qrCodeData?: string; // Optional, for generation
+    qrCodeUrl?: string; // Optional, for stored QR codes
   };
 }
 
@@ -18,15 +19,20 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
   const [qrCodeUrl, setQrCodeUrl] = React.useState<string>('');
 
   React.useEffect(() => {
-    // Generate QR code for verification
-    QRCode.toDataURL(memberData.qrCodeData, {
-      errorCorrectionLevel: 'H',
-      type: 'image/png',
-      quality: 0.95,
-      margin: 1,
-      width: 120,
-    }).then(setQrCodeUrl);
-  }, [memberData.qrCodeData]);
+    // Use stored QR code URL if available, otherwise generate from data
+    if (memberData.qrCodeUrl) {
+      setQrCodeUrl(memberData.qrCodeUrl);
+    } else if (memberData.qrCodeData) {
+      // Generate QR code for verification
+      QRCode.toDataURL(memberData.qrCodeData, {
+        errorCorrectionLevel: 'H',
+        type: 'image/png',
+        quality: 0.95,
+        margin: 1,
+        width: 120,
+      }).then(setQrCodeUrl);
+    }
+  }, [memberData.qrCodeData, memberData.qrCodeUrl]);
 
   return (
     <div className="max-w-4xl mx-auto p-8">
