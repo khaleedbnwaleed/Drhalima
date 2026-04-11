@@ -19,6 +19,7 @@ export default function SupporterSignupPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [passwordStrength, setPasswordStrength] = useState('')
   const router = useRouter()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,15 +28,44 @@ export default function SupporterSignupPage() {
       ...prev,
       [name]: value
     }))
+
+    // Password strength indicator
+    if (name === 'password') {
+      if (value.length === 0) {
+        setPasswordStrength('')
+      } else if (value.length < 8) {
+        setPasswordStrength('weak')
+      } else if (value.length < 12) {
+        setPasswordStrength('medium')
+      } else {
+        setPasswordStrength('strong')
+      }
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setSuccess(false)
 
-    // Validation
-    if (!formData.organizationName || !formData.email || !formData.password) {
-      setError('Please fill in all required fields')
+    // Enhanced validation
+    if (!formData.organizationName.trim()) {
+      setError('Organization name is required')
+      return
+    }
+
+    if (!formData.email.trim()) {
+      setError('Email address is required')
+      return
+    }
+
+    if (!formData.password) {
+      setError('Password is required')
+      return
+    }
+
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters long')
       return
     }
 
@@ -44,8 +74,10 @@ export default function SupporterSignupPage() {
       return
     }
 
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters long')
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address')
       return
     }
 
@@ -56,19 +88,26 @@ export default function SupporterSignupPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          organizationName: formData.organizationName,
-          email: formData.email,
+          organizationName: formData.organizationName.trim(),
+          email: formData.email.trim().toLowerCase(),
           password: formData.password,
-          contactPerson: formData.contactPerson,
-          phone: formData.phone,
-          address: formData.address,
+          contactPerson: formData.contactPerson.trim() || null,
+          phone: formData.phone.trim() || null,
+          address: formData.address.trim() || null,
         }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.details ? `${data.error}: ${data.details}` : (data.error || 'Signup failed'))
+        // Handle specific error cases
+        if (response.status === 409) {
+          setError('This email address is already registered. Please use a different email or try logging in.')
+        } else if (response.status === 400) {
+          setError(data.error || 'Please check your information and try again.')
+        } else {
+          setError(data.details ? `${data.error}: ${data.details}` : (data.error || 'Signup failed. Please try again.'))
+        }
         return
       }
 
@@ -77,7 +116,8 @@ export default function SupporterSignupPage() {
         router.push('/supporter-login')
       }, 2000)
     } catch (err) {
-      setError('An error occurred. Please try again.')
+      console.error('Signup error:', err)
+      setError('Network error. Please check your connection and try again.')
     } finally {
       setLoading(false)
     }
@@ -219,6 +259,30 @@ export default function SupporterSignupPage() {
                   placeholder="••••••••"
                   required
                 />
+                {formData.password && (
+                  <div className="mt-2">
+                    <div className="flex items-center space-x-2">
+                      <div className="flex-1 bg-gray-200 rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full transition-all duration-300 ${
+                            passwordStrength === 'weak' ? 'bg-red-500 w-1/3' :
+                            passwordStrength === 'medium' ? 'bg-yellow-500 w-2/3' :
+                            passwordStrength === 'strong' ? 'bg-green-500 w-full' : 'w-0'
+                          }`}
+                        ></div>
+                      </div>
+                      <span className={`text-xs font-medium ${
+                        passwordStrength === 'weak' ? 'text-red-600' :
+                        passwordStrength === 'medium' ? 'text-yellow-600' :
+                        passwordStrength === 'strong' ? 'text-green-600' : 'text-gray-400'
+                      }`}>
+                        {passwordStrength === 'weak' ? 'Weak' :
+                         passwordStrength === 'medium' ? 'Medium' :
+                         passwordStrength === 'strong' ? 'Strong' : ''}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -234,6 +298,12 @@ export default function SupporterSignupPage() {
                   placeholder="••••••••"
                   required
                 />
+                {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                  <p className="text-red-600 text-xs mt-1">Passwords do not match</p>
+                )}
+                {formData.confirmPassword && formData.password === formData.confirmPassword && formData.password && (
+                  <p className="text-green-600 text-xs mt-1">✓ Passwords match</p>
+                )}
               </div>
             </div>
 
