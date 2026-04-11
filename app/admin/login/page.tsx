@@ -42,8 +42,8 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 px-4 py-8">
-      <Card className="w-full max-w-md shadow-2xl border-0">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-4 py-8">
+      <Card className="w-full max-w-md shadow-xl">
         <div className="p-8 space-y-6">
           {/* Header */}
           <div className="text-center">
@@ -74,7 +74,7 @@ export default function AdminLoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Email
+                Email Address
               </label>
               <input
                 type="email"
@@ -103,16 +103,19 @@ export default function AdminLoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 font-semibold rounded-lg transition"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 font-semibold rounded-lg transition"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
 
-          {/* Footer */}
-          <div className="text-center text-sm">
-            <Link href="/" className="text-blue-600 hover:text-blue-700 font-medium transition">
-              ← Back to campaign site
+          {/* Back to Home */}
+          <div className="text-center">
+            <Link
+              href="/"
+              className="text-gray-600 text-sm hover:text-gray-800 transition"
+            >
+              Back to Home
             </Link>
           </div>
         </div>
