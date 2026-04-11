@@ -207,43 +207,83 @@ export default function SupporterRegistrationForm() {
   // Handle camera capture
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      // Check if getUserMedia is available
+      const constraints = {
+        video: {
+          facingMode: 'user',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      };
+      
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play();
+        };
         setShowCamera(true);
+        setError('');
       }
     } catch (err) {
-      setError('Unable to access camera. Please upload a photo instead.');
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      console.error('Camera error:', errorMessage);
+      if (errorMessage.includes('Permission denied')) {
+        setError('Camera permission denied. Please allow camera access in browser settings and try again.');
+      } else if (errorMessage.includes('NotSupported')) {
+        setError('Camera not supported on this device. Please upload a photo instead.');
+      } else {
+        setError('Unable to access camera. Please check permissions and try again, or upload a photo instead.');
+      }
     }
   };
 
   const capturePhoto = () => {
     if (videoRef.current && canvasRef.current) {
-      const canvas = canvasRef.current;
-      const video = videoRef.current;
-      const context = canvas.getContext('2d');
+      try {
+        const canvas = canvasRef.current;
+        const video = videoRef.current;
+        const context = canvas.getContext('2d');
 
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      context?.drawImage(video, 0, 0);
+        if (!context) {
+          setError('Failed to capture photo. Please try again.');
+          return;
+        }
 
-      const photoData = canvas.toDataURL('image/jpeg');
-      setProfilePhoto(photoData);
-      setPhotoPreview(photoData);
-      setShowCamera(false);
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+        context.drawImage(video, 0, 0);
 
-      // Stop camera stream
-      const stream = video.srcObject as MediaStream;
-      stream?.getTracks().forEach(track => track.stop());
-      setError('');
+        const photoData = canvas.toDataURL('image/jpeg', 0.9);
+        setProfilePhoto(photoData);
+        setPhotoPreview(photoData);
+        setError('');
+        setShowCamera(false);
+
+        // Stop camera stream
+        const stream = video.srcObject as MediaStream;
+        if (stream) {
+          stream.getTracks().forEach(track => track.stop());
+        }
+      } catch (err) {
+        setError('Failed to capture photo. Please try again.');
+        console.error('Capture error:', err);
+      }
     }
   };
 
   const cancelCamera = () => {
-    setShowCamera(false);
-    if (videoRef.current) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      stream?.getTracks().forEach(track => track.stop());
+    try {
+      setShowCamera(false);
+      if (videoRef.current) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        if (stream) {
+          stream.getTracks().forEach(track => track.stop());
+        }
+        videoRef.current.srcObject = null;
+      }
+    } catch (err) {
+      console.error('Error closing camera:', err);
     }
   };
 
@@ -256,6 +296,12 @@ export default function SupporterRegistrationForm() {
   };
 
   const onSubmit = async (data: SupporterFormData) => {
+    // Validate that we're on the last step
+    if (currentStep !== steps.length - 1) {
+      setCurrentStep(steps.length - 1);
+      return;
+    }
+
     setLoading(true);
     setError('');
 
