@@ -101,6 +101,28 @@ export default function SupporterDashboard() {
     fetchMembers()
   }
 
+  const handleRemoveMember = async (memberId: string) => {
+    if (!confirm('Are you sure you want to remove this member? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/supporter/organization/members/${memberId}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to remove member')
+      }
+
+      // Refresh members list
+      fetchMembers()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to remove member')
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -267,6 +289,7 @@ export default function SupporterDashboard() {
                           <TableHead>Location</TableHead>
                           <TableHead>Status</TableHead>
                           <TableHead>Registered</TableHead>
+                          <TableHead>Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -296,6 +319,16 @@ export default function SupporterDashboard() {
                             </TableCell>
                             <TableCell>
                               {new Date(member.created_at).toLocaleDateString('en-NG')}
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleRemoveMember(member.id)}
+                                className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                              >
+                                Remove
+                              </Button>
                             </TableCell>
                           </TableRow>
                         ))}

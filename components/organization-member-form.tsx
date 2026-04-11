@@ -44,13 +44,12 @@ const SUPPORT_STATUS_OPTIONS = [
 
 interface OrganizationMemberFormProps {
   onMemberAdded?: () => void
+  onBulkUpload?: () => void
 }
 
-export default function OrganizationMemberForm({ onMemberAdded }: OrganizationMemberFormProps) {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  const [selectedState, setSelectedState] = useState('')
+  const [showBulkUpload, setShowBulkUpload] = useState(false)
+  const [bulkFile, setBulkFile] = useState<File | null>(null)
+  const [bulkUploading, setBulkUploading] = useState(false)
 
   const {
     register,
@@ -64,45 +63,56 @@ export default function OrganizationMemberForm({ onMemberAdded }: OrganizationMe
     },
   })
 
-  const onSubmit = async (data: MemberFormData) => {
-    try {
-      setLoading(true)
-      setError('')
-      setSuccess('')
+  const handleBulkUpload = async () => {
+    if (!bulkFile) {
+      setError('Please select a CSV file')
+      return
+    }
 
-      const response = await fetch('/api/supporter/organization/members/register', {
+    setBulkUploading(true)
+    setError('')
+    setSuccess('')
+
+    try {
+      const formData = new FormData()
+      formData.append('file', bulkFile)
+
+      const response = await fetch('/api/supporter/organization/members/bulk', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: formData,
       })
 
       const result = await response.json()
 
       if (!response.ok) {
-        setError(result.error || 'Failed to register member')
+        setError(result.error || 'Bulk upload failed')
         return
       }
 
-      setSuccess(`Member ${data.first_name} ${data.last_name} registered successfully!`)
-      reset()
-      setSelectedState('')
-
-      // Refresh members list after a short delay
-      setTimeout(() => {
-        onMemberAdded?.()
-      }, 1500)
+      setSuccess(`Successfully uploaded ${result.successful} members. ${result.failed} failed.`)
+      setBulkFile(null)
+      onMemberAdded?.()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      setError(err instanceof Error ? err.message : 'Bulk upload failed')
     } finally {
-      setLoading(false)
+      setBulkUploading(false)
     }
   }
 
   return (
     <Card className="p-8">
-      <h3 className="text-2xl font-bold text-gray-900 mb-8">
-        Register Organization Member
-      </h3>
+      <div className="flex justify-between items-center mb-8">
+        <h3 className="text-2xl font-bold text-gray-900">
+          Register Organization Member{showBulkUpload ? 's' : ''}
+        </h3>
+        <Button
+          variant="outline"
+          onClick={() => setShowBulkUpload(!showBulkUpload)}
+          className="flex items-center gap-2"
+        >
+          {showBulkUpload ? 'Single Registration' : 'Bulk Upload'}
+        </Button>
+      </div>
 
       {error && (
         <Alert variant="destructive" className="mb-6">
@@ -118,9 +128,44 @@ export default function OrganizationMemberForm({ onMemberAdded }: OrganizationMe
         </Alert>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Name Row */}
-        <div className="grid md:grid-cols-2 gap-4">
+      {showBulkUpload ? (
+        // Bulk Upload Form
+        <div className="space-y-6">
+          <div>
+            <Label htmlFor="csvFile" className="mb-2 block">
+              Upload CSV File
+            </Label>
+            <Input
+              id="csvFile"
+              type="file"
+              accept=".csv"
+              onChange={(e) => setBulkFile(e.target.files?.[0] || null)}
+              className="mb-4"
+            />
+            <p className="text-sm text-gray-600">
+              CSV format: first_name,last_name,email,phone,state,lga,ward,support_status
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              Example: John,Doe,john@example.com,08012345678,Lagos,Lagos Island,Ward 1,supporter
+            </p>
+          </div>
+
+          <div className="pt-6 border-t">
+            <Button
+              onClick={handleBulkUpload}
+              disabled={!bulkFile || bulkUploading}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3"
+              size="lg"
+            >
+              {bulkUploading ? 'Uploading Members...' : 'Upload Members'}
+            </Button>
+          </div>
+        </div>
+      ) : (
+        // Single Member Registration Form
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Name Row */}
+          <div className="grid md:grid-cols-2 gap-4">
           <div>
             <Label htmlFor="first_name" className="mb-2 block">
               First Name *
@@ -272,7 +317,8 @@ export default function OrganizationMemberForm({ onMemberAdded }: OrganizationMe
             {loading ? 'Registering Member...' : 'Register Member'}
           </Button>
         </div>
-      </form>
+        </form>
+      )}
 
       <p className="text-sm text-gray-600 mt-4">
         Fields marked with * are required. This member will be registered as part of your organization
@@ -280,4 +326,3 @@ export default function OrganizationMemberForm({ onMemberAdded }: OrganizationMe
       </p>
     </Card>
   )
-}
