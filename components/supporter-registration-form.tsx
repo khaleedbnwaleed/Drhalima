@@ -702,7 +702,7 @@ export default function SupporterRegistrationForm() {
                       muted
                       className="w-full rounded-lg mb-4 bg-black"
                       style={{ minHeight: '300px' }}
-                    />
+                    ></video>
                     <canvas ref={canvasRef} className="hidden" />
                     <div className="flex gap-3">
                       <Button onClick={capturePhoto} className="flex-1">
