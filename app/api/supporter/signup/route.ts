@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import * as bcrypt from 'bcryptjs'
+import { generateSupporterID } from '@/lib/validation'
 
 export async function POST(request: Request) {
   try {
@@ -38,27 +39,41 @@ export async function POST(request: Request) {
     // Hash password
     const passwordHash = await bcrypt.hash(password, 12)
 
+    // Generate unique supporter ID
+    const supporterId = generateSupporterID()
+
     // Create organization supporter record
     const { data: newSupporter, error: createError } = await supabase
       .from('supporters')
       .insert([
         {
-          organization_name: organizationName,
+          supporter_id: supporterId,
+          first_name: contactPerson?.split(' ')[0] || organizationName,
+          last_name: contactPerson?.split(' ').slice(1).join(' ') || 'Organization',
           email,
+          phone: phone || '',
+          state: 'National', // Organizations can be national
+          lga: 'Supporter Organization',
+          ward: 'Organization',
+          organization_name: organizationName,
           password_hash: passwordHash,
           contact_person: contactPerson || null,
-          phone: phone || null,
           address: address || null,
           account_type: 'organization',
+          support_status: 'strong_supporter',
           status: 'active',
         }
       ])
       .select()
 
     if (createError) {
-      console.error('Database error:', createError)
+      console.error('Database error:', JSON.stringify(createError, null, 2))
       return Response.json(
-        { error: 'Failed to create account. Please try again.' },
+        { 
+          error: 'Failed to create account. Please try again.',
+          details: createError.message,
+          code: createError.code
+        },
         { status: 500 }
       )
     }
@@ -78,7 +93,10 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('API error:', error)
     return Response.json(
-      { error: 'Internal server error' },
+      { 
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     )
   }
