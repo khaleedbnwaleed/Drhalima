@@ -354,7 +354,7 @@ export default function SupporterRegistrationForm() {
               lga: registrationData.supporter.lga,
               ward: registrationData.supporter.ward,
               photoUrl: registrationData.supporter.photoUrl || '/default-avatar.png',
-              qrCodeUrl: result?.qrCodeUrl,
+              qrCodeUrl: registrationData?.qrCodeUrl,
               qrCodeData: `SUP:${registrationData.supporter.supporterId}|EMAIL:${registrationData.supporter.email}`,
             }}
           />
