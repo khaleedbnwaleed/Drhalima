@@ -47,6 +47,7 @@ interface OrganizationMemberFormProps {
   onBulkUpload?: () => void
 }
 
+export default function OrganizationMemberForm({ onMemberAdded, onBulkUpload }: OrganizationMemberFormProps) {
   const [showBulkUpload, setShowBulkUpload] = useState(false)
   const [bulkFile, setBulkFile] = useState<File | null>(null)
   const [bulkUploading, setBulkUploading] = useState(false)
@@ -326,3 +327,4 @@ interface OrganizationMemberFormProps {
       </p>
     </Card>
   )
+}
