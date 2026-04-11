@@ -1,8 +1,9 @@
 // Messaging service for email notifications
 import { Resend } from 'resend';
 
-// Initialize Resend client
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResendClient() {
+  return new Resend(process.env.RESEND_API_KEY || '')
+}
 
 /**
  * Send confirmation email after registration
@@ -14,7 +15,7 @@ export async function sendRegistrationConfirmationEmail(
   qrCodeUrl?: string
 ): Promise<boolean> {
   try {
-    await resend.emails.send({
+    await getResendClient().emails.send({
       from: 'campaign@drhalimasulaiman.ng',
       to: email,
       subject: 'Welcome to Dr. Halima Sulaiman Campaign - Registration Confirmation',
