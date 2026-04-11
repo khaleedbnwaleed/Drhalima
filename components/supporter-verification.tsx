@@ -242,21 +242,14 @@ export default function SupporterVerification() {
             <p className="text-sm text-gray-600 mb-4">
               This member is registered and verified in our campaign database.
             </p>
-                <div className="flex items-center gap-3">
-                  <img src="/APC.png" alt="APC Logo" className="h-10 w-auto" />
-                  <div className="text-white/90 leading-tight">
-                    <div className="text-sm font-semibold tracking-wider">DR. HALIMA CAMPAIGN</div>
-                    <div className="text-xs text-white/70 uppercase tracking-wide">MEMBERSHIP CARD</div>
-                  </div>
-                </div>
-                <div className="text-white/60 text-xs font-light">
-                  Federal Republic of Nigeria
-                </div>
-              </div>
 
-              {/* Main card content */}
-              <div className="p-6 bg-white/95 backdrop-blur-sm">
-                <div className="flex items-center gap-6">
+            <Button
+              onClick={() => window.print()}
+              variant="outline"
+              className="mr-2"
+            >
+              Print ID Card
+            </Button>
                   {/* Photo section */}
                   <div className="relative">
                     <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-green-100 shadow-lg">
