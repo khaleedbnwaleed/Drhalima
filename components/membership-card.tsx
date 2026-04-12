@@ -34,32 +34,35 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
 
   return (
     <div className="max-w-[95vw] md:max-w-4xl mx-auto p-4 md:p-8">
-      <div className="membership-card membership-card-print bg-linear-to-br from-green-900 via-green-800 to-green-900 rounded-2xl shadow-2xl overflow-hidden relative print:shadow-none print:rounded-none">
+      <div className="membership-card membership-card-print bg-linear-to-br from-emerald-900 via-green-800 to-emerald-900 rounded-3xl shadow-2xl overflow-hidden relative print:shadow-none print:rounded-none border border-emerald-700/30">
         {/* Background watermark */}
-        <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 opacity-[0.03]">
           <div className="w-full h-full bg-[url('/APC.png')] bg-no-repeat bg-center bg-contain"></div>
         </div>
 
         {/* Top accent bar */}
-        <div className="bg-linear-to-r from-yellow-400/20 to-transparent h-12 md:h-16 flex items-center justify-between px-4 md:px-6 gap-2 md:gap-4">
-          <div className="flex items-center gap-2 md:gap-3">
-            <img src="/APC.png" alt="APC Logo" className="h-8 md:h-10 w-auto" />
-            <div className="text-white/90 leading-tight">
-              <div className="text-xs md:text-sm font-semibold tracking-wider">DR. HALIMA CAMPAIGN</div>
-              <div className="text-xs text-white/70 uppercase tracking-wide">MEMBERSHIP CARD</div>
+        <div className="bg-linear-to-r from-amber-400/25 via-yellow-400/20 to-amber-400/25 h-14 md:h-16 flex items-center justify-between px-6 md:px-8 gap-4 relative">
+          <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent"></div>
+          <div className="flex items-center gap-3 md:gap-4 relative z-10">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/20">
+              <img src="/APC.png" alt="APC Logo" className="h-8 md:h-10 w-auto" />
+            </div>
+            <div className="text-white leading-tight">
+              <div className="text-sm md:text-base font-bold tracking-wider uppercase">Dr. Halima Campaign</div>
+              <div className="text-xs md:text-sm text-white/80 font-medium uppercase tracking-wide">Official Membership Card</div>
             </div>
           </div>
-          <div className="text-white/60 text-xs font-light hidden sm:block">
+          <div className="text-white/70 text-xs md:text-sm font-light hidden sm:block relative z-10">
             Federal Republic of Nigeria
           </div>
         </div>
 
         {/* Main card content */}
-        <div className="p-4 md:p-6 bg-white/95 backdrop-blur-sm">
-          <div className="flex items-center gap-2 md:gap-6">
+        <div className="p-6 md:p-8 bg-linear-to-br from-white via-gray-50/50 to-white backdrop-blur-sm relative">
+          <div className="flex items-start gap-4 md:gap-6">
             {/* Photo section */}
             <div className="relative shrink-0">
-              <div className="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-green-100 shadow-lg">
+              <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl overflow-hidden border-4 border-emerald-200 shadow-xl ring-2 ring-emerald-100/50">
                 <img
                   src={memberData.photoUrl || '/default-avatar.png'}
                   alt="Member Photo"
@@ -69,78 +72,93 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
                   }}
                 />
               </div>
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-green-600 rounded-full flex items-center justify-center">
-                <User size={10} className="md:w-3 md:h-3 w-2.5 h-2.5 text-white" />
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 md:w-8 md:h-8 bg-linear-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                <User size={14} className="text-white" />
               </div>
             </div>
 
             {/* Main content */}
-            <div className="flex-1 grid grid-cols-2 gap-2 md:gap-4">
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {/* Left column */}
-              <div className="space-y-2 md:space-y-3">
+              <div className="space-y-3 md:space-y-4">
                 <div>
-                  <h2 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">
+                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-2">
                     {memberData.fullName || 'Member Name'}
                   </h2>
-                  <div className="inline-flex items-center px-2 md:px-3 py-1 bg-green-100 text-green-800 text-sm md:text-sm font-medium rounded-full mt-1 md:mt-2">
-                    <IdCard size={12} className="md:w-3.5 md:h-3.5 mr-1" />
+                  <div className="inline-flex items-center px-3 md:px-4 py-2 bg-linear-to-r from-emerald-100 to-green-100 text-emerald-800 text-sm md:text-base font-semibold rounded-full shadow-sm border border-emerald-200">
+                    <IdCard size={16} className="mr-2" />
                     {memberData.cardId}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-1 md:gap-2 text-sm md:text-sm">
-                  <div className="flex items-center text-gray-600">
-                    <MapPin size={12} className="md:w-3.5 md:h-3.5 mr-2 text-green-600" />
-                    <span className="font-medium">State:</span>
-                    <span className="ml-1 md:ml-2">{memberData.state}</span>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <MapPin size={12} className="md:w-3.5 md:h-3.5 mr-2 text-green-600" />
-                    <span className="font-medium">LGA:</span>
-                    <span className="ml-1 md:ml-2">{memberData.lga}</span>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <MapPin size={12} className="md:w-3.5 md:h-3.5 mr-2 text-green-600" />
-                    <span className="font-medium">Ward:</span>
-                    <span className="ml-1 md:ml-2">{memberData.ward}</span>
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 shadow-sm">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Location Details</h3>
+                  <div className="grid grid-cols-1 gap-2">
+                    <div className="flex items-center text-gray-700">
+                      <MapPin size={14} className="mr-3 text-emerald-600 shrink-0" />
+                      <span className="font-medium text-gray-600 min-w-15">State:</span>
+                      <span className="font-semibold">{memberData.state}</span>
+                    </div>
+                    <div className="flex items-center text-gray-700">
+                      <MapPin size={14} className="mr-3 text-emerald-600 shrink-0" />
+                      <span className="font-medium text-gray-600 min-w-15">LGA:</span>
+                      <span className="font-semibold">{memberData.lga}</span>
+                    </div>
+                    <div className="flex items-center text-gray-700">
+                      <MapPin size={14} className="mr-3 text-emerald-600 shrink-0" />
+                      <span className="font-medium text-gray-600 min-w-15">Ward:</span>
+                      <span className="font-semibold">{memberData.ward}</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Right column - QR Code */}
-              <div className="flex flex-col items-end">
-                <div className="bg-gray-50 p-2 md:p-3 rounded-lg border border-gray-200 shadow-sm">
-                  <div className="text-xs text-gray-500 text-center mb-1 md:mb-2 font-medium">
-                    Scan to Verify
+              <div className="flex flex-col items-center md:items-end">
+                <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-gray-200/60 shadow-lg">
+                  <div className="text-center mb-3">
+                    <div className="text-sm font-semibold text-gray-700 mb-1">Verification Code</div>
+                    <div className="text-xs text-gray-500">Scan to authenticate</div>
                   </div>
-                  {qrCodeUrl && (
-                    <img
-                      src={qrCodeUrl}
-                      alt="QR Code"
-                      className="w-16 h-16 md:w-20 md:h-20"
-                    />
-                  )}
+                  <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-inner">
+                    {qrCodeUrl && (
+                      <img
+                        src={qrCodeUrl}
+                        alt="QR Code"
+                        className="w-20 h-20 md:w-24 md:h-24 mx-auto"
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="mt-6 pt-4 border-t border-gray-200">
-            <div className="flex justify-between items-center text-xs text-gray-500">
-              <div>
-                <span className="font-medium">Valid:</span> Lifetime Membership
+          <div className="mt-6 pt-6 border-t border-gray-200/60">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-linear-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center">
+                  <div className="w-3 h-3 bg-white rounded-full"></div>
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-gray-800">Lifetime Membership</div>
+                  <div className="text-xs text-gray-500">Valid indefinitely</div>
+                </div>
               </div>
               <div className="text-right">
-                <div>Digital Signature</div>
-                <div className="w-24 h-6 border-b border-gray-300 mt-1"></div>
+                <div className="text-sm font-semibold text-gray-800 mb-1">Authorized Signature</div>
+                <div className="w-32 h-8 border-b-2 border-emerald-300 bg-linear-to-r from-transparent via-emerald-100 to-transparent"></div>
+                <div className="text-xs text-gray-500 mt-1">Campaign Director</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Bottom accent */}
-          <div className="h-2 bg-linear-to-r from-yellow-400 via-green-500 to-yellow-400"></div>
+        <div className="h-3 bg-linear-to-r from-amber-400 via-yellow-400 to-amber-400 relative">
+          <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent"></div>
+        </div>
       </div>
 
       {/* Print styles */}
