@@ -12,9 +12,7 @@ export async function generateSupporterQRCode(supporterId: string, email: string
     
     // Generate as data URL (PNG image encoded as base64)
     const qrCodeDataUrl = await QRCode.toDataURL(qrData, {
-      errorCorrectionLevel: 'H',
       type: 'image/png',
-      quality: 0.95,
       margin: 1,
       width: 300,
     });

@@ -1,12 +1,15 @@
+import { NextRequest } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
 /**
  * PUT /api/admin/volunteers/[id] - Update volunteer status or assignment
  */
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
+  const params = await context.params;
+
   try {
     const body = await request.json();
     const { status, assignedLga, assignedWard, volunteerRole } = body;
@@ -42,9 +45,11 @@ export async function PUT(
  * GET /api/admin/volunteers/[id] - Get single volunteer details
  */
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
+  const params = await context.params;
+
   try {
     const { data, error } = await supabase
       .from('volunteers')

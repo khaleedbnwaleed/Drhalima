@@ -80,7 +80,7 @@ export async function middleware(request: NextRequest) {
         action: 'page_access',
         resource: pathname,
         timestamp: new Date().toISOString(),
-        ipAddress: request.ip,
+        ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
         userAgent: request.headers.get('user-agent'),
       };
 

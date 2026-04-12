@@ -1,3 +1,4 @@
+import { NextRequest } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -142,12 +143,12 @@ export async function POST(request: Request) {
  * PUT /api/news/[id] - Update a news post
  */
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest
 ) {
   try {
     const body = await request.json();
     const {
+      id,
       title_en,
       title_ha,
       content_en,
@@ -201,6 +202,10 @@ export async function PUT(
     }
 
     // Update news post
+    if (!id) {
+      return Response.json({ error: 'News post id is required' }, { status: 400 });
+    }
+
     const { data, error } = await supabase
       .from('news')
       .update({
@@ -216,7 +221,7 @@ export async function PUT(
         tags: tags || [],
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select();
 
     if (error) {
@@ -242,14 +247,19 @@ export async function PUT(
  * DELETE /api/news/[id] - Delete a news post
  */
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: Request
 ) {
   try {
+    const { id } = await request.json();
+
+    if (!id) {
+      return Response.json({ error: 'News post id is required' }, { status: 400 });
+    }
+
     const { error } = await supabase
       .from('news')
       .delete()
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (error) {
       return Response.json({ error: 'Failed to delete news post' }, { status: 500 });

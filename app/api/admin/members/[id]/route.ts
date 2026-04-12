@@ -1,12 +1,15 @@
+import { NextRequest } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
 /**
  * GET /api/admin/members/[id] - Get member details
  */
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
+  const params = await context.params;
+
   try {
     const { data, error } = await supabase
       .from('supporters')
@@ -29,9 +32,11 @@ export async function GET(
  * PUT /api/admin/members/[id] - Update member status or information
  */
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
+  const params = await context.params;
+
   try {
     const body = await request.json();
     const { supportStatus, firstName, lastName, phone, lga, ward, occupation } = body;
@@ -83,9 +88,11 @@ export async function PUT(
  * DELETE /api/admin/members/[id] - Delete a member
  */
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
+  const params = await context.params;
+
   try {
     // Delete from voter_tracking first
     await supabase

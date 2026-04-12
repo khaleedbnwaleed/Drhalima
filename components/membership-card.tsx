@@ -25,9 +25,7 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
     } else if (memberData.qrCodeData) {
       // Generate QR code for verification
       QRCode.toDataURL(memberData.qrCodeData, {
-        errorCorrectionLevel: 'H',
         type: 'image/png',
-        quality: 0.95,
         margin: 1,
         width: 120,
       }).then(setQrCodeUrl);

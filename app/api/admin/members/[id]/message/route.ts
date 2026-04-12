@@ -1,12 +1,15 @@
+import { NextRequest } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
 /**
  * POST /api/admin/members/[id]/message - Send a message to a specific member
  */
 export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
+  const params = await context.params;
+
   try {
     const body = await request.json();
     const { subject, message, messageType = 'direct' } = body;

@@ -5,7 +5,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert } from '@/components/ui/alert';
 import { AlertCircle, Send, Clock, CheckCircle } from 'lucide-react';
@@ -273,32 +272,36 @@ export default function MessagingCenter() {
               {/* Target Group */}
               <div>
                 <Label htmlFor="targetGroup">Target Group *</Label>
-                <Select
+                <select
+                  id="targetGroup"
                   name="targetGroup"
                   value={formData.targetGroup}
                   onChange={handleInputChange}
+                  className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
                 >
                   <option value="all_supporters">All Supporters</option>
                   <option value="by_lga">By LGA</option>
                   <option value="by_ward">By Ward</option>
                   <option value="by_support_level">By Support Level</option>
-                </Select>
+                </select>
               </div>
 
               {/* Conditional Target Filters */}
               {formData.targetGroup === 'by_lga' && (
                 <div>
                   <Label htmlFor="targetLga">Select LGA</Label>
-                  <Select
+                  <select
+                    id="targetLga"
                     name="targetLga"
                     value={formData.targetLga || ''}
                     onChange={handleInputChange}
+                    className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
                   >
                     <option value="">-- Select LGA --</option>
                     <option value="Alimosho">Alimosho</option>
                     <option value="Ajeromi-Ifelodun">Ajeromi-Ifelodun</option>
                     {/* Add more LGAs */}
-                  </Select>
+                  </select>
                 </div>
               )}
 
@@ -318,16 +321,18 @@ export default function MessagingCenter() {
               {formData.targetGroup === 'by_support_level' && (
                 <div>
                   <Label htmlFor="targetSupportStatus">Support Status</Label>
-                  <Select
+                  <select
+                    id="targetSupportStatus"
                     name="targetSupportStatus"
                     value={formData.targetSupportStatus || ''}
                     onChange={handleInputChange}
+                    className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
                   >
                     <option value="">-- Select Status --</option>
                     <option value="strong_supporter">Strong Supporters</option>
                     <option value="undecided">Undecided</option>
                     <option value="opponent">Opponents</option>
-                  </Select>
+                  </select>
                 </div>
               )}
 

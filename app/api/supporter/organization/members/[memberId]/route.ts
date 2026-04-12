@@ -1,10 +1,13 @@
+import { NextRequest } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { cookies } from 'next/headers'
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { memberId: string } }
+  request: NextRequest,
+  context: { params: Promise<{ memberId: string }> }
 ) {
+  const params = await context.params;
+
   try {
     const cookieStore = await cookies()
     const tokenStr = cookieStore.get('supporterToken')?.value

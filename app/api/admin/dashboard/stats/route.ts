@@ -1,5 +1,8 @@
 import { supabase } from '@/lib/supabase';
 
+// Prevent Next.js from trying to collect page data at build time
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/admin/dashboard/stats - Get real-time dashboard statistics
  */
