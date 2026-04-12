@@ -1,29 +1,44 @@
-import { createClient } from '@supabase/supabase-js'
+﻿import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY
 
-// Create clients only if URL is available, otherwise throw error in production
+// Lazy initialization to avoid build-time errors
+let supabaseClient: any = null
+let supabasePublicClient: any = null
+
 function getSupabaseClient() {
-  if (!supabaseUrl || !supabaseServiceRoleKey) {
-    const error = new Error('Supabase configuration missing. Please check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.')
-    console.error(error.message)
-    throw error
+  if (!supabaseClient) {
+    if (!supabaseUrl || !supabaseServiceRoleKey) {
+      throw new Error('Supabase configuration missing. Please check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.')
+    }
+    supabaseClient = createClient(supabaseUrl, supabaseServiceRoleKey)
   }
-  return createClient(supabaseUrl, supabaseServiceRoleKey)
+  return supabaseClient
 }
 
 function getSupabasePublicClient() {
-  if (!supabaseUrl || !supabaseAnonKey) {
-    const error = new Error('Supabase configuration missing. Please check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_ANON_KEY environment variables.')
-    console.error(error.message)
-    throw error
+  if (!supabasePublicClient) {
+    if (!supabaseUrl || !supabaseAnonKey) {
+      throw new Error('Supabase configuration missing. Please check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_ANON_KEY environment variables.')
+    }
+    supabasePublicClient = createClient(supabaseUrl, supabaseAnonKey)
   }
-  return createClient(supabaseUrl, supabaseAnonKey)
+  return supabasePublicClient
 }
 
-export const supabase = getSupabaseClient()
+// Export as proxies to enable lazy initialization
+export const supabase = new Proxy({}, {
+  get(target, prop) {
+    const client = getSupabaseClient()
+    return client[prop]
+  }
+})
 
-// For client-side usage (public operations)
-export const supabasePublic = getSupabasePublicClient()
+export const supabasePublic = new Proxy({}, {
+  get(target, prop) {
+    const client = getSupabasePublicClient()
+    return client[prop]
+  }
+})
