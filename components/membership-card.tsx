@@ -41,7 +41,7 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
         </div>
 
         {/* Top accent bar */}
-        <div className="bg-linear-to-r from-amber-400/25 via-yellow-400/20 to-amber-400/25 h-14 md:h-16 flex items-center justify-between px-6 md:px-8 gap-4 relative">
+        <div className="bg-linear-to-r from-amber-400/25 via-yellow-400/20 to-amber-400/25 h-12 md:h-14 flex items-center justify-between px-6 md:px-8 gap-4 relative">
           <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent"></div>
           <div className="flex items-center gap-3 md:gap-4 relative z-10">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/20">
@@ -58,7 +58,7 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
         </div>
 
         {/* Main card content */}
-        <div className="p-6 md:p-8 bg-linear-to-br from-white via-gray-50/50 to-white backdrop-blur-sm relative">
+        <div className="p-4 md:p-6 bg-linear-to-br from-white via-gray-50/50 to-white backdrop-blur-sm relative">
           <div className="flex items-start gap-4 md:gap-6">
             {/* Photo section */}
             <div className="relative shrink-0">
@@ -78,7 +78,7 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
             </div>
 
             {/* Main content */}
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               {/* Left column */}
               <div className="space-y-3 md:space-y-4">
                 <div>
@@ -91,9 +91,9 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
                   </div>
                 </div>
 
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 shadow-sm">
-                  <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Location Details</h3>
-                  <div className="grid grid-cols-1 gap-2">
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-3 border border-gray-200/50 shadow-sm">
+                  <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Location Details</h3>
+                  <div className="grid grid-cols-1 gap-1.5">
                     <div className="flex items-center text-gray-700">
                       <MapPin size={14} className="mr-3 text-emerald-600 shrink-0" />
                       <span className="font-medium text-gray-600 min-w-15">State:</span>
@@ -135,7 +135,7 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
           </div>
 
           {/* Footer */}
-          <div className="mt-6 pt-6 border-t border-gray-200/60">
+          <div className="mt-4 pt-4 border-t border-gray-200/60">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-linear-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center">
@@ -156,7 +156,7 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
         </div>
 
         {/* Bottom accent */}
-        <div className="h-3 bg-linear-to-r from-amber-400 via-yellow-400 to-amber-400 relative">
+        <div className="h-2 bg-linear-to-r from-amber-400 via-yellow-400 to-amber-400 relative">
           <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent"></div>
         </div>
       </div>
