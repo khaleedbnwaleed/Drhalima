@@ -62,7 +62,7 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
           <div className="flex items-start gap-4 md:gap-6">
             {/* Photo section */}
             <div className="relative shrink-0">
-              <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl overflow-hidden border-4 border-emerald-200 shadow-xl ring-2 ring-emerald-100/50">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-4 border-emerald-200 shadow-xl ring-2 ring-emerald-100/50">
                 <img
                   src={memberData.photoUrl || '/default-avatar.png'}
                   alt="Member Photo"
@@ -72,21 +72,21 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
                   }}
                 />
               </div>
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 md:w-8 md:h-8 bg-linear-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                <User size={14} className="text-white" />
+              <div className="absolute -bottom-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-linear-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                <User size={12} className="text-white" />
               </div>
             </div>
 
             {/* Main content */}
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+            <div className="flex-1 grid grid-cols-2 gap-3 md:gap-4">
               {/* Left column */}
               <div className="space-y-3 md:space-y-4">
                 <div>
-                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-2">
+                  <h2 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight mb-2">
                     {memberData.fullName || 'Member Name'}
                   </h2>
-                  <div className="inline-flex items-center px-3 md:px-4 py-2 bg-linear-to-r from-emerald-100 to-green-100 text-emerald-800 text-sm md:text-base font-semibold rounded-full shadow-sm border border-emerald-200">
-                    <IdCard size={16} className="mr-2" />
+                  <div className="inline-flex items-center px-2 md:px-3 py-1 md:py-2 bg-linear-to-r from-emerald-100 to-green-100 text-emerald-800 text-sm font-semibold rounded-full shadow-sm border border-emerald-200">
+                    <IdCard size={14} className="mr-1 md:mr-2" />
                     {memberData.cardId}
                   </div>
                 </div>
@@ -114,7 +114,7 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
               </div>
 
               {/* Right column - QR Code */}
-              <div className="flex flex-col items-center md:items-end">
+              <div className="flex flex-col items-center">
                 <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-gray-200/60 shadow-lg">
                   <div className="text-center mb-3">
                     <div className="text-sm font-semibold text-gray-700 mb-1">Verification Code</div>
@@ -125,7 +125,7 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
                       <img
                         src={qrCodeUrl}
                         alt="QR Code"
-                        className="w-20 h-20 md:w-24 md:h-24 mx-auto"
+                        className="w-16 h-16 md:w-20 md:h-20 mx-auto"
                       />
                     )}
                   </div>
