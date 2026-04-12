@@ -4,33 +4,21 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY
 
-// Create clients only if URL is available, otherwise create dummy clients
+// Create clients only if URL is available, otherwise throw error in production
 function getSupabaseClient() {
   if (!supabaseUrl || !supabaseServiceRoleKey) {
-    // Return a dummy client for build time - this won't be used in production
-    return {
-      from: () => ({
-        select: () => ({ data: null, error: 'Supabase not configured' }),
-        insert: () => ({ data: null, error: 'Supabase not configured' }),
-        update: () => ({ data: null, error: 'Supabase not configured' }),
-        delete: () => ({ data: null, error: 'Supabase not configured' }),
-      }),
-    } as any
+    const error = new Error('Supabase configuration missing. Please check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.')
+    console.error(error.message)
+    throw error
   }
   return createClient(supabaseUrl, supabaseServiceRoleKey)
 }
 
 function getSupabasePublicClient() {
   if (!supabaseUrl || !supabaseAnonKey) {
-    // Return a dummy client for build time
-    return {
-      from: () => ({
-        select: () => ({ data: null, error: 'Supabase not configured' }),
-        insert: () => ({ data: null, error: 'Supabase not configured' }),
-        update: () => ({ data: null, error: 'Supabase not configured' }),
-        delete: () => ({ data: null, error: 'Supabase not configured' }),
-      }),
-    } as any
+    const error = new Error('Supabase configuration missing. Please check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_ANON_KEY environment variables.')
+    console.error(error.message)
+    throw error
   }
   return createClient(supabaseUrl, supabaseAnonKey)
 }
