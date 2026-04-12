@@ -200,6 +200,13 @@ ALTER TABLE messaging_campaigns ENABLE ROW LEVEL SECURITY;
 ALTER TABLE message_delivery ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist (to avoid conflicts)
+DROP POLICY IF EXISTS supporters_admin_only ON supporters;
+DROP POLICY IF EXISTS voter_tracking_admin_only ON voter_tracking;
+DROP POLICY IF EXISTS messaging_campaigns_admin_only ON messaging_campaigns;
+DROP POLICY IF EXISTS message_delivery_admin_only ON message_delivery;
+DROP POLICY IF EXISTS audit_logs_admin_only ON audit_logs;
+
 -- Policies for admins only
 CREATE POLICY supporters_admin_only ON supporters FOR ALL
   USING ((SELECT role FROM users WHERE id = auth.uid()) = 'admin');
