@@ -21,10 +21,11 @@ export async function POST(request: Request) {
     if (!supabaseUrl || !supabaseKey ||
         supabaseUrl.includes('placeholder') ||
         supabaseKey.includes('placeholder')) {
+      console.error('Supabase configuration missing:', { supabaseUrl: !!supabaseUrl, supabaseKey: !!supabaseKey });
       return Response.json(
         {
           error: 'Database not configured',
-          details: 'Supabase environment variables are not set up. Please configure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in your .env.local file.'
+          details: 'Supabase environment variables are not set up. Please configure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in your deployment environment.'
         },
         { status: 500 }
       );
