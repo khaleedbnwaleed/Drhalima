@@ -181,9 +181,12 @@ export default function SupporterRegistrationForm() {
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError('Photo must be less than 5MB');
+      // Validate file size (max 5MB for desktop, 2MB for mobile)
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const maxSize = isMobile ? 2 * 1024 * 1024 : 5 * 1024 * 1024; // 2MB for mobile, 5MB for desktop
+
+      if (file.size > maxSize) {
+        setError(`Photo must be less than ${isMobile ? '2MB' : '5MB'}`);
         return;
       }
 
@@ -208,14 +211,20 @@ export default function SupporterRegistrationForm() {
   const startCamera = async () => {
     try {
       // Check if getUserMedia is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setError('Camera not supported on this device. Please upload a photo instead.');
+        return;
+      }
+
+      // Try different constraints for better mobile compatibility
       const constraints = {
         video: {
-          facingMode: 'user',
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
+          facingMode: { ideal: 'user' }, // Use ideal instead of exact for better compatibility
+          width: { ideal: 640, max: 1280 }, // Lower resolution for mobile
+          height: { ideal: 480, max: 720 }
         }
       };
-      
+
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -228,12 +237,16 @@ export default function SupporterRegistrationForm() {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       console.error('Camera error:', errorMessage);
-      if (errorMessage.includes('Permission denied')) {
+      if (errorMessage.includes('Permission denied') || errorMessage.includes('permission')) {
         setError('Camera permission denied. Please allow camera access in browser settings and try again.');
-      } else if (errorMessage.includes('NotSupported')) {
+      } else if (errorMessage.includes('NotSupported') || errorMessage.includes('not supported')) {
         setError('Camera not supported on this device. Please upload a photo instead.');
+      } else if (errorMessage.includes('NotFound') || errorMessage.includes('not found')) {
+        setError('No camera found on this device. Please upload a photo instead.');
+      } else if (errorMessage.includes('NotAllowed') || errorMessage.includes('not allowed')) {
+        setError('Camera access blocked. Please check your browser settings and try again.');
       } else {
-        setError('Unable to access camera. Please check permissions and try again, or upload a photo instead.');
+        setError('Unable to access camera. Please upload a photo instead.');
       }
     }
   };
@@ -250,11 +263,37 @@ export default function SupporterRegistrationForm() {
           return;
         }
 
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
-        context.drawImage(video, 0, 0);
+        // Use video dimensions, but limit for mobile
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const maxWidth = isMobile ? 800 : 1280;
+        const maxHeight = isMobile ? 600 : 720;
 
-        const photoData = canvas.toDataURL('image/jpeg', 0.9);
+        canvas.width = Math.min(video.videoWidth || 640, maxWidth);
+        canvas.height = Math.min(video.videoHeight || 480, maxHeight);
+
+        // Scale video to fit canvas while maintaining aspect ratio
+        const videoAspect = video.videoWidth / video.videoHeight;
+        const canvasAspect = canvas.width / canvas.height;
+
+        let drawWidth, drawHeight, offsetX, offsetY;
+
+        if (videoAspect > canvasAspect) {
+          // Video is wider than canvas
+          drawWidth = canvas.height * videoAspect;
+          drawHeight = canvas.height;
+          offsetX = (canvas.width - drawWidth) / 2;
+          offsetY = 0;
+        } else {
+          // Video is taller than canvas
+          drawWidth = canvas.width;
+          drawHeight = canvas.width / videoAspect;
+          offsetX = 0;
+          offsetY = (canvas.height - drawHeight) / 2;
+        }
+
+        context.drawImage(video, offsetX, offsetY, drawWidth, drawHeight);
+
+        const photoData = canvas.toDataURL('image/jpeg', 0.8); // Lower quality for mobile
         setProfilePhoto(photoData);
         setPhotoPreview(photoData);
         setError('');
@@ -343,24 +382,39 @@ export default function SupporterRegistrationForm() {
     setError('');
 
     try {
+      // Check network connectivity
+      if (!navigator.onLine) {
+        setError('No internet connection. Please check your network and try again.');
+        return;
+      }
+
       // Clean phone number: remove spaces, dashes, parentheses
       const cleanedPhone = data.phone.replace(/[\s\-\(\)]/g, '');
-      
+
       // Clean PVC number: remove spaces, dashes
       const cleanedPVC = data.pvcNumber ? data.pvcNumber.replace(/[\s\-]/g, '') : '';
+
+      // Prepare form data
+      const formData = {
+        ...data,
+        phone: cleanedPhone,
+        pvcNumber: cleanedPVC || undefined,
+        state: 'Jigawa',
+        profilePhoto: profilePhoto || undefined,
+      };
+
+      // Add timeout for mobile networks
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
       const response = await fetch('/api/supporters', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...data,
-          phone: cleanedPhone,
-          pvcNumber: cleanedPVC || undefined,
-          state: 'Jigawa',
-          profilePhoto: profilePhoto || undefined,
-        }),
+        body: JSON.stringify(formData),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
       const result = await response.json();
 
       if (!response.ok) {
@@ -393,19 +447,19 @@ export default function SupporterRegistrationForm() {
       setPhotoPreview(null);
       setShowCamera(false);
     } catch (err) {
-      setError('An unexpected error occurred');
       console.error('Registration error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const steps = [
-    { label: 'Personal Info', value: 'personal' },
-    { label: 'Location', value: 'location' },
-    { label: 'Voter Info', value: 'voter' },
-  ];
-
+      if (err instanceof Error) {
+        if (err.name === 'AbortError') {
+          setError('Request timed out. Please check your internet connection and try again.');
+        } else if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+          setError('Network error. Please check your internet connection and try again.');
+        } else {
+          setError(`Registration failed: ${err.message}`);
+        }
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
   return (
     <div className="max-w-2xl mx-auto">
       {showPrivacyNotice ? (
