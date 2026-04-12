@@ -33,7 +33,7 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
   }, [memberData.qrCodeData, memberData.qrCodeUrl]);
 
   return (
-    <div className="max-w-4xl mx-auto p-8">
+    <div className="max-w-[95vw] md:max-w-4xl mx-auto p-4 md:p-8">
       <div className="membership-card membership-card-print bg-linear-to-br from-green-900 via-green-800 to-green-900 rounded-2xl shadow-2xl overflow-hidden relative print:shadow-none print:rounded-none">
         {/* Background watermark */}
         <div className="absolute inset-0 opacity-5">
@@ -41,25 +41,25 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
         </div>
 
         {/* Top accent bar */}
-        <div className="bg-linear-to-r from-yellow-400/20 to-transparent h-16 flex items-center justify-between px-6 gap-4">
-          <div className="flex items-center gap-3">
-            <img src="/APC.png" alt="APC Logo" className="h-10 w-auto" />
+        <div className="bg-linear-to-r from-yellow-400/20 to-transparent h-12 md:h-16 flex items-center justify-between px-4 md:px-6 gap-2 md:gap-4">
+          <div className="flex items-center gap-2 md:gap-3">
+            <img src="/APC.png" alt="APC Logo" className="h-8 md:h-10 w-auto" />
             <div className="text-white/90 leading-tight">
-              <div className="text-sm font-semibold tracking-wider">DR. HALIMA CAMPAIGN</div>
+              <div className="text-xs md:text-sm font-semibold tracking-wider">DR. HALIMA CAMPAIGN</div>
               <div className="text-xs text-white/70 uppercase tracking-wide">MEMBERSHIP CARD</div>
             </div>
           </div>
-          <div className="text-white/60 text-xs font-light">
+          <div className="text-white/60 text-xs font-light hidden sm:block">
             Federal Republic of Nigeria
           </div>
         </div>
 
         {/* Main card content */}
         <div className="p-4 md:p-6 bg-white/95 backdrop-blur-sm">
-          <div className="flex items-center gap-4 md:gap-6">
+          <div className="flex items-center gap-2 md:gap-6">
             {/* Photo section */}
             <div className="relative shrink-0">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-green-100 shadow-lg">
+              <div className="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-green-100 shadow-lg">
                 <img
                   src={memberData.photoUrl || '/default-avatar.png'}
                   alt="Member Photo"
@@ -75,20 +75,20 @@ export default function MembershipCard({ memberData }: MembershipCardProps) {
             </div>
 
             {/* Main content */}
-            <div className="flex-1 grid grid-cols-2 gap-3 md:gap-4">
+            <div className="flex-1 grid grid-cols-2 gap-2 md:gap-4">
               {/* Left column */}
               <div className="space-y-2 md:space-y-3">
                 <div>
-                  <h2 className="text-lg md:text-2xl font-bold text-gray-900 leading-tight">
+                  <h2 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">
                     {memberData.fullName || 'Member Name'}
                   </h2>
-                  <div className="inline-flex items-center px-2 md:px-3 py-1 bg-green-100 text-green-800 text-xs md:text-sm font-medium rounded-full mt-1 md:mt-2">
+                  <div className="inline-flex items-center px-2 md:px-3 py-1 bg-green-100 text-green-800 text-sm md:text-sm font-medium rounded-full mt-1 md:mt-2">
                     <IdCard size={12} className="md:w-3.5 md:h-3.5 mr-1" />
                     {memberData.cardId}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-1 md:gap-2 text-xs md:text-sm">
+                <div className="grid grid-cols-1 gap-1 md:gap-2 text-sm md:text-sm">
                   <div className="flex items-center text-gray-600">
                     <MapPin size={12} className="md:w-3.5 md:h-3.5 mr-2 text-green-600" />
                     <span className="font-medium">State:</span>
